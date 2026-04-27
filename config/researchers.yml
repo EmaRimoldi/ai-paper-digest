@@ -1,0 +1,81 @@
+researchers:
+  - name: Andrej Karpathy
+    areas: [foundation models, agents, education]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+  - name: Yann LeCun
+    areas: [representation learning, world models, AI theory]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+  - name: Jeff Dean
+    areas: [foundation models, systems, deep learning]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+  - name: Chelsea Finn
+    areas: [robot learning, RL, foundation models]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+  - name: Percy Liang
+    areas: [foundation models, evaluation, agents]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+  - name: Fei-Fei Li
+    areas: [computer vision, AI, human-centered AI]
+    x_handle: unknown
+    website: unknown
+    priority: medium
+
+  - name: Yoshua Bengio
+    areas: [deep learning, AI safety, representation learning]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+  - name: David Haussler
+    areas: [computational biology, ML]
+    x_handle: unknown
+    website: unknown
+    priority: medium
+
+  - name: Boaz Barak
+    areas: [theory, learning theory, foundations]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+  - name: Jacob Steinhardt
+    areas: [AI safety, evaluation, robustness]
+    x_handle: unknown
+    website: unknown
+    priority: high
+
+labs_and_feeds:
+  - name: OpenAI Research
+    url: unknown
+    priority: high
+  - name: DeepMind Research
+    url: unknown
+    priority: high
+  - name: Anthropic Research
+    url: unknown
+    priority: high
+  - name: Stanford HAI
+    url: unknown
+    priority: medium
+  - name: BAIR
+    url: unknown
+    priority: high
+  - name: MIT CSAIL
+    url: unknown
+    priority: high
+

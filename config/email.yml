@@ -1,0 +1,8 @@
+email:
+  enabled: true
+  gmail_drafts_enabled: false
+  auto_send: false
+  daily_template: "email/templates/daily_digest.md"
+  weekly_template: "email/templates/weekly_digest.md"
+  note: "Draft locally by default. Use Gmail only when an integration is explicitly available."
+

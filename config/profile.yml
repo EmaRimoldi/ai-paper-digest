@@ -1,0 +1,48 @@
+user:
+  name: Emanuele
+  current_status: "Master's student at MIT"
+  newsletter_goal: "Daily AI research radar with a public GitHub catalog of concise paper notes."
+
+research_interests:
+  high_priority:
+    - theoretical machine learning
+    - foundation models
+    - AI agents
+    - evaluation of AI systems
+    - trustworthy AI
+    - safe AI
+    - reinforcement learning
+    - optimization for machine learning
+    - statistical learning
+    - representation learning
+    - mechanistic interpretability
+    - NeuroAI
+    - computational neuroscience with machine learning
+    - AI-adjacent applied mathematics
+    - automated academic research
+    - automated scientific discovery
+    - benchmark design
+    - verification regimes
+  medium_priority:
+    - machine learning systems
+    - probabilistic modeling
+    - scientific machine learning
+    - computational cognition
+    - data-centric AI
+    - AI for science
+    - code generation evaluation
+
+output_preferences:
+  daily_email_digest: true
+  public_github_catalog: true
+  max_daily_highlights: 10
+  max_email_items: 10
+  max_pdf_downloads_per_day: 20
+  max_deep_summaries_per_day: 15
+  include_pdf_links: true
+  include_arxiv_links: true
+  include_code_links: true
+  include_public_catalog_pages: true
+  include_safe_images: true
+  prefer_gmail_draft_before_auto_send: true
+

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" rx="28" fill="#172554"/>
+  <rect x="24" y="24" width="912" height="372" rx="24" fill="none" stroke="#22c55e" stroke-width="3"/>
+  <text x="48" y="74" fill="#fff7ed" font-size="18" font-family="Trebuchet MS, sans-serif">2026-04-26 · Must read</text>
+  <text x="48" y="136" fill="#f8fafc" font-size="34" font-family="Georgia, serif">ArmSSL: Adversarial Robust Black-Box Watermarking for Self-Supervised Learning Pre-trained Enco…</text>
+  <text x="48" y="184" fill="#cbd5e1" font-size="20" font-family="Trebuchet MS, sans-serif">Safety Alignment</text>
+  <text x="48" y="240" fill="#e5e7eb" font-size="22" font-family="Trebuchet MS, sans-serif">Self-supervised learning (SSL) encoders are invaluable intellectual property (IP).</text>
+  <text x="48" y="340" fill="#fdba74" font-size="20" font-family="Trebuchet MS, sans-serif">It looks relevant to safety alignment and is a plausible candidate for a first-pass read.</text>
+</svg>

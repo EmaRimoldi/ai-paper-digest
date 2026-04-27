@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="380" viewBox="0 0 720 380">
+  <rect width="720" height="380" rx="28" fill="#0f172a"/>
+  <rect x="24" y="24" width="672" height="332" rx="22" fill="none" stroke="#f97316" stroke-width="3"/>
+  <text x="44" y="86" fill="#f8fafc" font-size="38" font-family="Georgia, serif">Foundation Models</text>
+  <text x="44" y="126" fill="#cbd5e1" font-size="20" font-family="Trebuchet MS, sans-serif">Scaling, reasoning, multimodality, post-training, and test-time inference behavior.</text>
+  <text x="44" y="330" fill="#fdba74" font-size="24" font-family="Trebuchet MS, sans-serif">48 tracked papers</text>
+</svg>

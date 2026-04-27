@@ -1,0 +1,18 @@
+github:
+  enabled: true
+  auto_commit: true
+  auto_push: false
+  branch: main
+  commit_message_prefix: "update paper radar"
+  publish_paths:
+    - README.md
+    - catalog/
+    - public/
+    - docs/
+    - data/papers.csv
+  never_publish_paths:
+    - library/
+    - email/
+    - config/*.secret.yml
+    - .env
+

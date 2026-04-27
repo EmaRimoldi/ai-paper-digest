@@ -1,0 +1,9 @@
+social_sources:
+  enabled: true
+  rss_feeds: []
+  public_project_pages: []
+  github_repositories: []
+  freshness_days: 7
+  max_items_per_feed: 15
+  note: "Add verified public RSS and research feeds here. Do not automate login-only sources."
+

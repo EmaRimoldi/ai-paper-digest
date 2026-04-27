@@ -1,0 +1,78 @@
+arxiv_categories:
+  - cs.LG
+  - stat.ML
+  - cs.AI
+  - cs.CL
+  - cs.CV
+  - cs.NE
+  - cs.RO
+  - q-bio.NC
+  - stat.ME
+  - stat.TH
+  - math.OC
+  - math.ST
+
+keyword_groups:
+  theory_ml:
+    - "learning theory"
+    - "generalization"
+    - "statistical learning"
+    - "optimization"
+    - "PAC-Bayes"
+    - "sample complexity"
+    - "scaling laws"
+
+  foundation_models:
+    - "foundation model"
+    - "large language model"
+    - "LLM"
+    - "transformer"
+    - "pretraining"
+    - "in-context learning"
+    - "test-time compute"
+    - "reasoning model"
+
+  agents_evaluation:
+    - "AI agent"
+    - "agent evaluation"
+    - "tool use"
+    - "computer use"
+    - "benchmark"
+    - "verification"
+    - "self-improvement"
+    - "multi-agent"
+
+  safety_trustworthy:
+    - "AI safety"
+    - "alignment"
+    - "robustness"
+    - "trustworthy AI"
+    - "model evaluation"
+    - "red teaming"
+    - "jailbreak"
+    - "unlearning"
+
+  reinforcement_learning:
+    - "reinforcement learning"
+    - "RLHF"
+    - "policy optimization"
+    - "bandit"
+    - "offline RL"
+    - "reward model"
+
+  neuroai:
+    - "NeuroAI"
+    - "computational neuroscience"
+    - "brain-inspired"
+    - "neural coding"
+    - "cognitive model"
+    - "representation alignment"
+
+  automated_research:
+    - "automated research"
+    - "scientific discovery"
+    - "paper writing"
+    - "literature review"
+    - "research agent"
+    - "AI scientist"
+

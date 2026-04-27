@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" rx="28" fill="#0f172a"/>
+  <rect x="24" y="24" width="912" height="372" rx="24" fill="none" stroke="#f97316" stroke-width="3"/>
+  <text x="48" y="74" fill="#fff7ed" font-size="18" font-family="Trebuchet MS, sans-serif">2026-04-26 · Must read</text>
+  <text x="48" y="136" fill="#f8fafc" font-size="34" font-family="Georgia, serif">SpikingBrain2.0: Brain-Inspired Foundation Models for Efficient Long-Context and Cross-Platform…</text>
+  <text x="48" y="184" fill="#cbd5e1" font-size="20" font-family="Trebuchet MS, sans-serif">Foundation Models</text>
+  <text x="48" y="240" fill="#e5e7eb" font-size="22" font-family="Trebuchet MS, sans-serif">Scaling context length is reshaping large-model development, yet full-attention Transformers suffer from prohibitive co…</text>
+  <text x="48" y="340" fill="#fdba74" font-size="20" font-family="Trebuchet MS, sans-serif">It looks relevant to foundation models and is a plausible candidate for a first-pass read.</text>
+</svg>

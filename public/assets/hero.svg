@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="50%" stop-color="#7c2d12"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1030" cy="120" r="160" fill="rgba(255,255,255,0.07)"/>
+  <circle cx="140" cy="520" r="110" fill="rgba(255,255,255,0.06)"/>
+  <rect x="70" y="82" width="190" height="34" rx="17" fill="#f97316"/>
+  <text x="95" y="105" fill="#fff7ed" font-size="18" font-family="Georgia, serif">Daily Research Radar</text>
+  <text x="70" y="210" fill="#f8fafc" font-size="72" font-weight="700" font-family="Georgia, serif">AI Paper Radar</text>
+  <text x="70" y="280" fill="#e2e8f0" font-size="30" font-family="'Trebuchet MS', sans-serif">Noise-to-signal monitoring for modern AI research.</text>
+  <text x="70" y="334" fill="#cbd5e1" font-size="24" font-family="'Trebuchet MS', sans-serif">Top 10 picks, short notes, topic tracking, and public-safe publishing.</text>
+  <text x="70" y="498" fill="#fed7aa" font-size="22" font-family="'Trebuchet MS', sans-serif">Updated 2026-04-26</text>
+  <text x="70" y="536" fill="#fef3c7" font-size="22" font-family="'Trebuchet MS', sans-serif">I outsource the noise, not the thinking.</text>
+</svg>

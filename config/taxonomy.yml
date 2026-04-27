@@ -1,0 +1,95 @@
+topics:
+  foundation_models:
+    title: "Foundation Models"
+    description: "Scaling, reasoning, multimodality, post-training, and test-time inference behavior."
+    subtopics:
+      - scaling_laws
+      - reasoning
+      - in_context_learning
+      - multimodal_models
+      - post_training
+      - test_time_compute
+
+  agents:
+    title: "Agents & Tool Use"
+    description: "Tool-using models, computer use, long-horizon execution, and agent systems."
+    subtopics:
+      - agent_benchmarks
+      - tool_use
+      - computer_use
+      - multi_agent_systems
+      - long_horizon_tasks
+
+  evaluation:
+    title: "Evaluation & Benchmarks"
+    description: "LLM evaluation, contamination, verifier design, and benchmark validity."
+    subtopics:
+      - llm_evaluation
+      - benchmark_validity
+      - human_eval
+      - contamination
+      - verification
+
+  safety_alignment:
+    title: "Safety, Alignment & Robustness"
+    description: "Alignment, robustness, unlearning, and adversarial evaluation."
+    subtopics:
+      - alignment
+      - robustness
+      - adversarial_evaluation
+      - unlearning
+      - interpretability_for_safety
+
+  theory_optimization:
+    title: "Theory, Optimization & Statistical Learning"
+    description: "Learning theory, optimization, generalization, and statistical foundations."
+    subtopics:
+      - learning_theory
+      - generalization
+      - optimization
+      - statistical_learning
+      - information_theory
+
+  reinforcement_learning:
+    title: "Reinforcement Learning"
+    description: "Policy optimization, offline RL, reward models, and RL for LLMs."
+    subtopics:
+      - policy_optimization
+      - offline_rl
+      - reward_models
+      - rl_for_llms
+
+  neuroai:
+    title: "NeuroAI & Computational Neuroscience"
+    description: "Brain alignment, neural coding, cognitive models, and biologically inspired learning."
+    subtopics:
+      - brain_alignment
+      - neural_coding
+      - cognitive_models
+      - biologically_inspired_learning
+
+  automated_research:
+    title: "Automated Research"
+    description: "Research agents, literature review systems, and AI for science workflows."
+    subtopics:
+      - research_agents
+      - automated_literature_review
+      - paper_writing_agents
+      - AI_for_science
+
+  interpretability:
+    title: "Interpretability"
+    description: "Mechanistic interpretability, representation analysis, and circuit discovery."
+    subtopics:
+      - mechanistic_interpretability
+      - representation_analysis
+      - circuit_discovery
+
+  benchmarks:
+    title: "Benchmark Design"
+    description: "Benchmark methodology, verifier design, and reproducibility practices."
+    subtopics:
+      - benchmark_methodology
+      - verifier_design
+      - reproducibility
+

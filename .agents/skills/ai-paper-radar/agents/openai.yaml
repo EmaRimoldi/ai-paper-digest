@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Paper Radar"
+  short_description: "Run the daily AI paper radar workflow"
+  default_prompt: "Use $ai-paper-radar to run today's AI paper radar workflow."

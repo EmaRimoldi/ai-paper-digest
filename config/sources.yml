@@ -1,0 +1,36 @@
+sources:
+  arxiv:
+    enabled: true
+    type: api
+    base_url: "https://export.arxiv.org/api/query"
+    recent_page_url_template: "https://arxiv.org/list/{category}/recent"
+    priority: high
+    fallback_recent_pages: true
+
+  openreview:
+    enabled: true
+    type: api
+    base_url: "https://api.openreview.net"
+    priority: medium
+    venues: []
+
+  semantic_scholar:
+    enabled: true
+    type: api
+    base_url: "https://api.semanticscholar.org/graph/v1"
+    priority: high
+    api_key_env: "SEMANTIC_SCHOLAR_API_KEY"
+
+  openalex:
+    enabled: true
+    type: api
+    base_url: "https://api.openalex.org"
+    priority: medium
+    api_key_env: "OPENALEX_API_KEY"
+
+  gmail_alerts:
+    enabled: false
+    type: email
+    query: "label:AI/Papers newer_than:7d"
+    priority: low
+
