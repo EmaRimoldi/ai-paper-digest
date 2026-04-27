@@ -2,11 +2,6 @@
 title: 'PASR: Pose-Aware 3D Shape Retrieval from Occluded Single Views'
 authors:
 - Jiaxin Shi
-- Guofeng Zhang
-- Wufei Ma
-- Naifu Liang
-- Adam Kortylewski
-- Alan Vuile
 date: '2026-04-26'
 primary_topic: safety_alignment
 secondary_topics:
@@ -39,6 +34,8 @@ To address this problem, we propose Pose-Aware 3D Shape Retrieval (PASR), a fram
 ## Key results
 
 - PASR substantially outperforms existing methods on both clean and occluded 3D shape retrieval datasets by a wide margin.
+- PASR achieves competitive clean, occluded, and unseen 3D shape retrieval from single images, while also enabling multitasking with accurate category classification and p…
+- While these approaches excel on synthetic benchmarks, their generalization to real-world images is limited.
 
 ## Method in brief
 

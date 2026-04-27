@@ -3,11 +3,6 @@ title: 'ArmSSL: Adversarial Robust Black-Box Watermarking for Self-Supervised Le
   Pre-trained Encoders'
 authors:
 - Yongqi Jiang
-- Yansong Gao
-- Boyu Kuang
-- Chunyi Zhou
-- Anmin Fu
-- Liquan Chen
 date: '2026-04-26'
 primary_topic: safety_alignment
 secondary_topics:
@@ -33,16 +28,18 @@ We propose ArmSSL, an SSL watermarking framework that assures black-box verifiab
 ## What it contributes
 
 - We propose ArmSSL, an SSL watermarking framework that assures black-box verifiability and adversarial robustness while preserving utility.
-- For utility, a reference-guided watermark tuning strategy is designed to allow the watermark to be learned as a small side task without affecting the main task by aligning the watermarked encoder's outputs with those of the original clean…
+- Forutility, a reference-guided watermark tuning strategy is designed to allow the watermark to be learned as a small side task without affecting the main task by aligning the watermarked encoder’s outputs with those of the original clean e…
 - It looks relevant to safety alignment and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- Extensive experiments across five mainstream SSL frameworks and nine benchmark datasets, along with end-to-end comparisons with SOTAs, demonstrate that ArmSSL achieves s…
+- SSL has achieved remarkable success in fields such as computer vision (CV) [2], natural language processing (NLP) [3], and autonomous driving [4].
+- The former pulls watermark representations toward anchors located at the representation centers of all rest non-source classes, entangling watermark and clean representa…
+- A key innovation of MoCo v2 is its use of a momentum encoder to maintain a dynamic queue of negative examples, which allows it to achieve higher representation accuracy…
 
 ## Method in brief
 
-For utility, a reference-guided watermark tuning strategy is designed to allow the watermark to be learned as a small side task without affecting the main task by aligning the watermarked encoder's outputs with those of the original clean…
+Forutility, a reference-guided watermark tuning strategy is designed to allow the watermark to be learned as a small side task without affecting the main task by aligning the watermarked encoder’s outputs with those of the original clean e…
 
 ## Caveats
 

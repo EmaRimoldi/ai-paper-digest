@@ -3,24 +3,6 @@ title: 'SpikingBrain2.0: Brain-Inspired Foundation Models for Efficient Long-Con
   and Cross-Platform Inference'
 authors:
 - Yuqi Pan
-- Jinghao Zhuang
-- Yupeng Feng
-- Fangzhi Zhong
-- Siyu Ding
-- Xuerui Qiu
-- Shaowei Gu
-- Bohan Sun
-- Zhiyong Qin
-- Yibo Zhong
-- Lingtao Ouyang
-- Kun Yang
-- Zehao Liu
-- Yuhong Chou
-- Shurong Wang
-- Anjie Hu
-- Han Xu
-- Bo Xu
-- Guoqi Li
 date: '2026-04-26'
 primary_topic: foundation_models
 secondary_topics:
@@ -46,20 +28,22 @@ We introduce SpikingBrain2.0 (SpB2.0), a 5B model that advances both architectur
 ## What it contributes
 
 - We introduce SpikingBrain2.0 (SpB2.0), a 5B model that advances both architecture and training efficiency of its predecessor.
-- SpB2.0 further supports dual quantization paths: INT8-Spiking coding enables sparse event-driven computation, while FP8 coding accelerates inference on modern GPUs. (2) Enhanced Training Strategy: We develop an optimized Transformer-to-Hyb…
+- Building on the integration of brain-inspired mechanisms and efficient large-model design, we introduceSpikingBrain2.0 (SpB2.0), a 5B model that substantially advances the architecture and training pipeline of its predecessor.
 - It looks relevant to foundation models and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- SpB2.0 achieves a 10.13x TTFT speedup at 4M context and supports over 10M tokens on 8 A100 GPUs under vLLM, where full-attention models exceed memory limits.
+- This brain-analogous sparse memory paradigm achieves a superior performance-efficiency trade-off for long-context modeling.
+- Consequently, a pivotal research frontier has emerged: how to architect foundation models that achieve both high-fidelity long-context modeling and superior inference ef…
+- From the architectural perspective, the dominant computational bottleneck of standard Transformers shifts from feed-forward matrix multiplications to attention operation…
 
 ## Method in brief
 
-SpB2.0 further supports dual quantization paths: INT8-Spiking coding enables sparse event-driven computation, while FP8 coding accelerates inference on modern GPUs. (2) Enhanced Training Strategy: We develop an optimized Transformer-to-Hyb…
+Building on the integration of brain-inspired mechanisms and efficient large-model design, we introduceSpikingBrain2.0 (SpB2.0), a 5B model that substantially advances the architecture and training pipeline of its predecessor.
 
 ## Caveats
 
-A key challenge is to design foundation models that maintain performance and long-context efficiency with minimal training overhead.
+However, conventional full-attention Transformers encounter prohibitive computational costs and inference bottlenecks as sequence lengths grow.
 
 ## Links
 

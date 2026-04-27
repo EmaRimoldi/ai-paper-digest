@@ -12,6 +12,7 @@ from .analysis import (
     build_venue_index,
     deduplicate_papers,
     ensure_schema,
+    first_author_name,
     rank_papers,
     summarize_paper,
     update_taxonomy_assignments,
@@ -57,7 +58,7 @@ def export_public_csv(papers: list[dict]) -> None:
             {
                 "id": paper.get("id", ""),
                 "title": paper.get("title", ""),
-                "authors": "; ".join(paper.get("authors", [])),
+                "authors": first_author_name(paper),
                 "published_date": paper.get("published_date", ""),
                 "source": paper.get("source", ""),
                 "venue_or_status": paper.get("venue_or_status", ""),

@@ -2,47 +2,6 @@
 title: 'Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond'
 authors:
 - Meng Chu
-- Xuan Billy Zhang
-- Kevin Qinghong Lin
-- Lingdong Kong
-- Jize Zhang
-- Teng Tu
-- Weijian Ma
-- Ziqi Huang
-- Senqiao Yang
-- Wei Huang
-- Yeying Jin
-- Zhefan Rao
-- Jinhui Ye
-- Xinyu Lin
-- Xichen Zhang
-- Qisheng Hu
-- Shuai Yang
-- Leyang Shen
-- Wei Chow
-- Yifei Dong
-- Fengyi Wu
-- Quanyu Long
-- Bin Xia
-- Shaozuo Yu
-- Mingkang Zhu
-- Wenhu Zhang
-- Jiehui Huang
-- Haokun Gui
-- Haoxuan Che
-- Long Chen
-- Qifeng Chen
-- Wenxuan Zhang
-- Wenya Wang
-- Xiaojuan Qi
-- Yang Deng
-- Yanwei Li
-- Mike Zheng Shou
-- Zhi-Qi Cheng
-- See-Kiong Ng
-- Ziwei Liu
-- Philip Torr
-- Jiaya Jia
 date: '2026-04-26'
 primary_topic: agents
 secondary_topics:
@@ -69,20 +28,22 @@ We introduce a "levels x laws" taxonomy organized along two axes.
 ## What it contributes
 
 - We introduce a "levels x laws" taxonomy organized along two axes.
-- As AI systems move from generating text to accomplishing goals through sustained interaction, the ability to model environment dynamics becomes a central bottleneck.
+- Because world models constitute a foundational component whose value extends beyond any single agent architecture, their growing importance makes conceptual clarity all the more urgent.
 - It looks relevant to agents and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the term world model carries…
+- Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the termworld modelcarries di…
+- Conversely, world models benefit from agentgenerated experience, which provides targeted, task-relevant trajectories that improve the model’s accuracy in decision-critic…
+- Yet the diversity outlined above also creates conceptual fragmentation: a vision researcher may evaluate a world model by the visual fidelity of its generated frames, wh…
 
 ## Method in brief
 
-As AI systems move from generating text to accomplishing goals through sustained interaction, the ability to model environment dynamics becomes a central bottleneck.
+Because world models constitute a foundational component whose value extends beyond any single agent architecture, their growing importance makes conceptual clarity all the more urgent.
 
 ## Caveats
 
-We analyze methods, failure modes, and evaluation practices across level-regime pairs, propose decision-centric evaluation principles and a minimal reproducible evaluation package, and outline architectural guidance, op…
+Weanalyzemethods, failuremodes, andevaluationpracticesacrosslevel–regimepairs, propose decision-centric evaluation principles and a minimal reproducible evaluation package, and outline architectural guidance, open probl…
 
 ## Links
 

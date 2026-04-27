@@ -64,6 +64,31 @@ DEFAULT_SCHEMA = {
     "last_checked_at": "",
 }
 
+SECTION_PATTERNS = {
+    "introduction": (
+        r"(?im)^(?:[ivxlcdm]+\.\s+introduction|[0-9]+(?:\.[0-9]+)?\s+introduction|introduction)\s*$",
+    ),
+    "method": (
+        r"(?im)^(?:[ivxlcdm]+\.\s+(?:method|methods|methodology|approach|framework)|[0-9]+(?:\.[0-9]+)?\s+(?:method|methods|methodology|approach|framework)|(?:method|methods|methodology|approach|framework))\s*$",
+        r"(?im)^(?:[ivxlcdm]+\.\s+(?:proposed method|proposed approach)|[0-9]+(?:\.[0-9]+)?\s+(?:proposed method|proposed approach))\s*$",
+    ),
+    "results": (
+        r"(?im)^(?:[ivxlcdm]+\.\s+(?:experiments|experiment|results|evaluation|experimental results)|[0-9]+(?:\.[0-9]+)?\s+(?:experiments|experiment|results|evaluation|experimental results)|(?:experiments|experiment|results|evaluation|experimental results))\s*$",
+    ),
+    "discussion": (
+        r"(?im)^(?:[ivxlcdm]+\.\s+(?:discussion|limitations|limitation|future work)|[0-9]+(?:\.[0-9]+)?\s+(?:discussion|limitations|limitation|future work)|(?:discussion|limitations|limitation|future work))\s*$",
+    ),
+    "conclusion": (
+        r"(?im)^(?:[ivxlcdm]+\.\s+(?:conclusion|conclusions)|[0-9]+(?:\.[0-9]+)?\s+(?:conclusion|conclusions)|(?:conclusion|conclusions))\s*$",
+    ),
+}
+
+GENERIC_HEADING_PATTERN = re.compile(
+    r"(?im)^(?:[ivxlcdm]+\.\s+[a-z][^\n]{0,90}|[0-9]+(?:\.[0-9]+)?\s+[a-z][^\n]{0,90}|"
+    r"(?:introduction|background|preliminaries|method|methods|methodology|approach|framework|"
+    r"experiments|experiment|results|evaluation|discussion|limitations|future work|conclusion|conclusions))\s*$"
+)
+
 TOPIC_KEYWORDS = {
     "foundation_models": [
         "llm",
@@ -186,6 +211,11 @@ def stable_paper_id(paper: dict) -> str:
             return value
     basis = f"{normalize_title(paper.get('title', ''))}|{paper.get('source', '')}"
     return hashlib.sha1(basis.encode("utf-8")).hexdigest()[:16]
+
+
+def first_author_name(paper: dict) -> str:
+    authors = paper.get("authors", [])
+    return clean_whitespace(authors[0]) if authors else ""
 
 
 def ensure_schema(paper: dict) -> dict:
@@ -501,7 +531,7 @@ def _pdf_path(paper: dict) -> Path | None:
     return path if path.exists() else None
 
 
-def extract_pdf_text(paper: dict, max_pages: int = 8) -> str:
+def extract_pdf_raw_text(paper: dict, max_pages: int = 8) -> str:
     pdf_path = _pdf_path(paper)
     if not pdf_path:
         return ""
@@ -509,25 +539,116 @@ def extract_pdf_text(paper: dict, max_pages: int = 8) -> str:
         reader = PdfReader(str(pdf_path))
         text_parts = []
         for page in reader.pages[:max_pages]:
-            text = clean_whitespace(page.extract_text() or "")
+            text = page.extract_text() or ""
             if text:
                 text_parts.append(text)
-        return _clean_pdf_text("\n".join(text_parts))
+        return "\n\n---PAGE---\n\n".join(text_parts)
     except Exception:
         return ""
+
+
+def extract_pdf_text(paper: dict, max_pages: int = 8) -> str:
+    return _clean_pdf_text(extract_pdf_raw_text(paper, max_pages=max_pages))
 
 
 def _clean_pdf_text(text: str) -> str:
     cleaned = text or ""
     cleaned = cleaned.replace("§", " ")
+    cleaned = re.sub(r"([A-Za-z])-\s*\n\s*([A-Za-z])", r"\1\2", cleaned)
     cleaned = re.sub(r"([A-Za-z])-\s+([A-Za-z])", r"\1\2", cleaned)
     cleaned = re.sub(r"arXiv:[^\n ]+", " ", cleaned)
     cleaned = re.sub(r"\bPreprint\b", " ", cleaned, flags=re.I)
     cleaned = re.sub(r"Disclaimer:[^.]+(?:\.)?", " ", cleaned, flags=re.I)
     cleaned = re.sub(r"https?://\S+", " ", cleaned)
     cleaned = re.sub(r"\b(?:Introduction|Contents|Table of Contents)\b", " ", cleaned, flags=re.I)
+    cleaned = re.sub(r"---PAGE---", " ", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned)
     return clean_whitespace(cleaned)
+
+
+def _normalize_pdf_for_sections(text: str) -> str:
+    normalized = text or ""
+    normalized = normalized.replace("\r", "\n")
+    normalized = re.sub(r"([A-Za-z])-\s*\n\s*([A-Za-z])", r"\1\2", normalized)
+    normalized = re.sub(r"[ \t]+", " ", normalized)
+    normalized = normalized.replace("§", "")
+    lines = []
+    for raw_line in normalized.splitlines():
+        line = clean_whitespace(raw_line)
+        if not line:
+            continue
+        if re.fullmatch(r"\d+", line):
+            continue
+        if line == "---PAGE---":
+            continue
+        lines.append(line)
+    return "\n".join(lines)
+
+
+def _find_first_match(text: str, patterns: tuple[str, ...]) -> re.Match[str] | None:
+    matches = [re.search(pattern, text) for pattern in patterns]
+    valid = [match for match in matches if match]
+    if not valid:
+        return None
+    return min(valid, key=lambda match: match.start())
+
+
+def _next_heading_start(text: str, after: int) -> int:
+    match = GENERIC_HEADING_PATTERN.search(text, after)
+    return match.start() if match else len(text)
+
+
+def _section_block(text: str, section_name: str) -> str:
+    patterns = SECTION_PATTERNS.get(section_name, ())
+    start_match = _find_first_match(text, patterns)
+    if not start_match:
+        return ""
+    start = start_match.end()
+    end = _next_heading_start(text, start)
+    return clean_whitespace(text[start:end])
+
+
+def _front_matter_candidate(text: str) -> str:
+    intro_match = _find_first_match(text, SECTION_PATTERNS["introduction"])
+    front = text[: intro_match.start()] if intro_match else text[:4000]
+    lines = []
+    for line in front.splitlines():
+        lowered = line.lower()
+        if any(
+            token in lowered
+            for token in (
+                "homepage:",
+                "github repo:",
+                "contact:",
+                "joint first author",
+                "correspondence author",
+                "university",
+                "institute",
+                "school of",
+                "department of",
+                "date:",
+                "preprint",
+            )
+        ):
+            continue
+        lines.append(line)
+    return clean_whitespace(" ".join(lines))
+
+
+def extract_pdf_sections(paper: dict, max_pages: int = 8) -> dict[str, str]:
+    raw_text = extract_pdf_raw_text(paper, max_pages=max_pages)
+    if not raw_text:
+        return {}
+    section_text = _normalize_pdf_for_sections(raw_text)
+    sections = {
+        "front_matter": _front_matter_candidate(section_text),
+        "method": _section_block(section_text, "method"),
+        "results": _section_block(section_text, "results"),
+        "discussion": _section_block(section_text, "discussion"),
+        "conclusion": _section_block(section_text, "conclusion"),
+    }
+    sections["abstract"] = clean_whitespace(paper.get("abstract", "")) or sections["front_matter"]
+    return {key: value for key, value in sections.items() if clean_whitespace(value)}
 
 
 def _dedupe_sentences(sentences: list[str], limit: int = 6) -> list[str]:
@@ -574,6 +695,8 @@ def _is_useful_sentence(sentence: str) -> bool:
         "institute of",
         "school of",
         "department of",
+        "joint first author",
+        "correspondence author",
     )
     if any(term in lowered for term in blocked_terms):
         return False
@@ -587,10 +710,12 @@ def _is_useful_sentence(sentence: str) -> bool:
         return False
     if len(re.findall(r"\b[A-Z][a-z]+\b", cleaned)) >= 8 and cleaned.count(",") >= 4:
         return False
+    if re.search(r"\b(?:fig(?:ure)?|table)\s+\d+\b", lowered):
+        return False
     return True
 
 
-def _distinct_from(sentence: str, others: list[str], threshold: float = 0.92) -> bool:
+def _distinct_from(sentence: str, others: list[str], threshold: float = 0.84) -> bool:
     candidate = normalize_title(sentence)
     if not candidate:
         return False
@@ -622,6 +747,15 @@ def _derive_contribution_sentences(sentences: list[str]) -> list[str]:
     return chosen or _fallback_slice(sentences, 0, 3, limit=3)
 
 
+def _prefer_quantitative(sentences: list[str]) -> list[str]:
+    quantitative = [
+        sentence
+        for sentence in sentences
+        if re.search(r"\b\d+(?:\.\d+)?\s*(?:%|x|ms|points|tokens|examples|benchmarks?)\b", sentence.lower())
+    ]
+    return quantitative or sentences
+
+
 def _derive_method_sentence(primary_sentences: list[str], backup_sentences: list[str], avoid: list[str]) -> str:
     for candidate_pool in (primary_sentences, backup_sentences):
         chosen = _pick_sentences(
@@ -638,6 +772,12 @@ def _derive_method_sentence(primary_sentences: list[str], backup_sentences: list
                 "via ",
                 "we synthesize",
                 "we formulate",
+                "we cast",
+                "we train",
+                "we optimize",
+                "we integrate",
+                "we embed",
+                "we decompose",
                 "by aligning",
                 "taxonomy",
             ),
@@ -671,7 +811,7 @@ def _derive_result_sentences(primary_sentences: list[str], backup_sentences: lis
             ),
             limit=6,
         )
-        distinct = [item for item in chosen if _distinct_from(item, avoid)]
+        distinct = [item for item in _prefer_quantitative(chosen) if _distinct_from(item, avoid)]
         if distinct:
             return distinct[:3]
     fallback = _fallback_slice(primary_sentences or backup_sentences, 1, 5, limit=4)
@@ -701,14 +841,34 @@ def _derive_caveat_sentence(sentences: list[str], used_pdf: bool) -> str:
 
 def summarize_paper(paper: dict) -> dict:
     paper = ensure_schema(paper)
+    pdf_sections = extract_pdf_sections(paper)
+    abstract_sentences = [sentence for sentence in split_sentences(pdf_sections.get("abstract", "")) if _is_useful_sentence(sentence)]
+    method_sentences = [sentence for sentence in split_sentences(pdf_sections.get("method", "")) if _is_useful_sentence(sentence)]
+    result_sentences_pool = [sentence for sentence in split_sentences(pdf_sections.get("results", "")) if _is_useful_sentence(sentence)]
+    discussion_sentences = [
+        sentence
+        for sentence in split_sentences(
+            " ".join(
+                filter(
+                    None,
+                    [
+                        pdf_sections.get("discussion", ""),
+                        pdf_sections.get("conclusion", ""),
+                    ],
+                )
+            )
+        )
+        if _is_useful_sentence(sentence)
+    ]
     pdf_text = extract_pdf_text(paper)
     pdf_sentences = [sentence for sentence in split_sentences(pdf_text) if _is_useful_sentence(sentence)]
-    abstract_sentences = [sentence for sentence in split_sentences(paper.get("abstract", "")) if _is_useful_sentence(sentence)]
-    used_pdf = len(pdf_sentences) >= 3
+    used_pdf = any((method_sentences, result_sentences_pool, discussion_sentences))
     primary_sentences = abstract_sentences or pdf_sentences
-    backup_sentences = pdf_sentences or abstract_sentences
-    sentences = primary_sentences or backup_sentences
-    if used_pdf:
+    method_source = method_sentences or pdf_sentences
+    result_source = result_sentences_pool or pdf_sentences
+    discussion_source = discussion_sentences or pdf_sentences
+    sentences = primary_sentences or pdf_sentences
+    if used_pdf or pdf_sentences:
         paper["summary_level"] = "pdf_summary"
     elif paper.get("abstract"):
         paper["summary_level"] = "abstract_summary"
@@ -717,10 +877,10 @@ def summarize_paper(paper: dict) -> dict:
     if sentences:
         contribution_sentences = _derive_contribution_sentences(primary_sentences)
         first = truncate(contribution_sentences[0] if contribution_sentences else primary_sentences[0], 180)
-        method_sentence = _derive_method_sentence(primary_sentences, backup_sentences, avoid=contribution_sentences)
+        method_sentence = _derive_method_sentence(method_source, pdf_sentences, avoid=contribution_sentences)
         result_sentences = _derive_result_sentences(
-            primary_sentences,
-            backup_sentences,
+            result_source,
+            pdf_sentences,
             avoid=contribution_sentences + [method_sentence],
         )
         result_sentence = truncate(result_sentences[0], 220) if result_sentences else "unknown"
@@ -729,7 +889,7 @@ def summarize_paper(paper: dict) -> dict:
         paper["method"] = method_sentence
         paper["main_result_or_claim"] = result_sentence
         paper["key_results"] = [truncate(sentence, 170) for sentence in result_sentences[:3]] or [truncate(first, 170)]
-        paper["limitations_or_caveats"] = _derive_caveat_sentence(sentences, used_pdf=used_pdf)
+        paper["limitations_or_caveats"] = _derive_caveat_sentence(discussion_source, used_pdf=used_pdf)
     else:
         paper["one_sentence_summary"] = truncate(
             f"{paper.get('title', 'This paper')} appears relevant, but the summary is based on metadata only.",

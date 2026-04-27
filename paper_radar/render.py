@@ -9,8 +9,10 @@ import yaml
 
 from .analysis import (
     clean_whitespace,
+    first_author_name,
     grouped_by_topic,
     note_path_for_paper,
+    similarity,
     slugify,
     topic_counts,
     top_topic_rows,
@@ -63,6 +65,8 @@ def _paper_contribution_lines(paper: dict) -> list[str]:
         normalized = clean_whitespace(candidate)
         key = normalized.lower()
         if not normalized or normalized == "unknown" or key in seen:
+            continue
+        if any(similarity(normalized, existing) >= 0.84 for existing in unique):
             continue
         seen.add(key)
         unique.append(normalized)
@@ -187,9 +191,10 @@ def build_catalog(top_papers: list[dict], all_papers: list[dict], taxonomy: dict
         slug = slugify(paper["title"])
         catalog_card_path = f"../../../public/assets/paper_cards/{slug}.svg"
         docs_card_path = f"../../../assets/paper_cards/{slug}.svg"
+        public_authors = [first_author_name(paper)] if first_author_name(paper) else []
         frontmatter = {
             "title": paper.get("title", ""),
-            "authors": paper.get("authors", []),
+            "authors": public_authors,
             "date": run_date.isoformat(),
             "primary_topic": paper.get("primary_topic", ""),
             "secondary_topics": paper.get("secondary_topics", []),

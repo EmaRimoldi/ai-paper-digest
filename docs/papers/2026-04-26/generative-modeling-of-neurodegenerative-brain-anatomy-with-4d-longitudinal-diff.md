@@ -3,10 +3,6 @@ title: Generative Modeling of Neurodegenerative Brain Anatomy with 4D Longitudin
   Diffusion Model
 authors:
 - Nivetha Jayakumar
-- Swakshar Deb
-- Bahram Jafrasteh
-- Qingyu Zhao
-- Miaomiao Zhang
 date: '2026-04-26'
 primary_topic: neuroai
 secondary_topics: []
@@ -44,7 +40,7 @@ We validate our model through both synthetic sequence generation and downstream 
 
 ## Caveats
 
-Understanding and predicting the progression of neurodegenerative diseases remains a major challenge in medical AI, with significant implications for early diagnosis, disease monitoring, and treatment planning.
+However, most available longitudinal neuroimaging datasets are temporally sparse with a few follow-up scans per subject.
 
 ## Links
 

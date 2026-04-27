@@ -3,14 +3,6 @@ title: 'ATRS: Adaptive Trajectory Re-splitting via a Shared Neural Policy for Pa
   Optimization'
 authors:
 - Jiajun Yu
-- Guodong Liu
-- Li Wang
-- Pengxiang Zhou
-- Wentao Liu
-- Yin He
-- Chao Xu
-- Fei Gao
-- Yanjun Cao
 date: '2026-04-26'
 primary_topic: agents
 secondary_topics:
@@ -37,7 +29,7 @@ To this end, we propose ATRS, a novel framework that embeds a shared Deep Reinfo
 ## What it contributes
 
 - To this end, we propose ATRS, a novel framework that embeds a shared Deep Reinforcement Learning policy into the parallel ADMM loop.
-- Parallel trajectory optimization via the Alternating Direction Method of Multipliers (ADMM) has emerged as a scalable approach to long-horizon motion planning.
+- In this section, we present the proposed adaptive trajectory re-splitting framework, ATRS.
 - It looks relevant to agents and is a plausible candidate for a first-pass read.
 
 ## Key results
@@ -48,11 +40,11 @@ To this end, we propose ATRS, a novel framework that embeds a shared Deep Reinfo
 
 ## Method in brief
 
-Parallel trajectory optimization via the Alternating Direction Method of Multipliers (ADMM) has emerged as a scalable approach to long-horizon motion planning.
+In this section, we present the proposed adaptive trajectory re-splitting framework, ATRS.
 
 ## Caveats
 
-However, existing frameworks typically decompose the problem into parallel subproblems based on a predefined fixed structure.
+Fast note from local PDF text. Verify claims and limitations directly in the paper.
 
 ## Links
 

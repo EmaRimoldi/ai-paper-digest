@@ -2,10 +2,6 @@
 title: Structure-Guided Diffusion Model for EEG-Based Visual Cognition Reconstruction
 authors:
 - Yongxiang Lian
-- Yueyang Cang
-- Pingge Hu
-- Yuchen He
-- Li Shi
 date: '2026-04-26'
 primary_topic: neuroai
 secondary_topics:
@@ -31,7 +27,7 @@ We propose a Structure-Guided Diffusion Model (SGDM) that incorporates explicit 
 ## What it contributes
 
 - We propose a Structure-Guided Diffusion Model (SGDM) that incorporates explicit structural information for EEG-based visual reconstruction.
-- Existing methods are largely restricted to natural images and categorical representations, with limited capacity to capture structural features and to differentiate objective perception from subjective cognition.
+- 1), a unified framework for EEG-based visual cognition reconstruction.
 - It looks relevant to neuroai and is a plausible candidate for a first-pass read.
 
 ## Key results
@@ -42,11 +38,11 @@ We propose a Structure-Guided Diffusion Model (SGDM) that incorporates explicit 
 
 ## Method in brief
 
-Existing methods are largely restricted to natural images and categorical representations, with limited capacity to capture structural features and to differentiate objective perception from subjective cognition.
+1), a unified framework for EEG-based visual cognition reconstruction.
 
 ## Caveats
 
-Fast note from local PDF text. Verify claims and limitations directly in the paper.
+However, the low signal-to-noise ratio, significant inter-individual variability, and complex associations among hierarchical visual semantics make it challenging to reconstruct images that humans “see” from EEG signals…
 
 ## Links
 

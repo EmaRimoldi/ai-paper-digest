@@ -2,17 +2,6 @@
 title: 'SOLAR-RL: Semi-Online Long-horizon Assignment Reinforcement Learning'
 authors:
 - Jichao Wang
-- Liuyang Bian
-- Yufeng Zhou
-- Han Xiao
-- Yue Pan
-- Guozhi Wang
-- Hao Wang
-- Zhaoxiong Wang
-- Yafei Wen
-- Xiaoxin Chen
-- Shuai Ren
-- Lingfang Zeng
 date: '2026-04-26'
 primary_topic: foundation_models
 secondary_topics:
@@ -39,16 +28,17 @@ To bridge this gap, we propose SOLAR-RL (Semi-Online Long-horizon Assignment Rei
 ## What it contributes
 
 - To bridge this gap, we propose SOLAR-RL (Semi-Online Long-horizon Assignment Reinforcement Learning).
-- Specifically, we reconstruct diverse rollout candidates from static data, detect the first failure point using per-step validity signals, and retroactively assign dense step-level rewards with target-aligned shaping to reflect trajectory-l…
+- In this section, we introduceSOLAR-RL, a Semionline Reinforcement Learning framework designed to address the credit assignment problem in long-horizon GUI navigation.
 - It looks relevant to foundation models and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- Extensive experiments demonstrate that SOLAR-RL significantly improves long-horizon task completion rates and robustness compared to strong baselines, offering a sample-…
+- In this section, we rigorously evaluate SOLAR-RL across three diverse benchmarks.
+- We aim to answer two key questions: (1) Does SOLAR-RL achieve competitive performance against state-of-the-art GUI agents, particularly under strict offline constraints?…
 
 ## Method in brief
 
-Specifically, we reconstruct diverse rollout candidates from static data, detect the first failure point using per-step validity signals, and retroactively assign dense step-level rewards with target-aligned shaping to reflect trajectory-l…
+In this section, we introduceSOLAR-RL, a Semionline Reinforcement Learning framework designed to address the credit assignment problem in long-horizon GUI navigation.
 
 ## Caveats
 
