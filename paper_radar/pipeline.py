@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import os
 import subprocess
 from datetime import date
@@ -51,6 +52,57 @@ def initialize_workspace() -> None:
         touch(path)
 
 
+def _csv_history_rows() -> list[dict]:
+    csv_path = DATA_DIR / "papers.csv"
+    if not csv_path.exists():
+        return []
+    with csv_path.open(encoding="utf-8", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def _csv_row_to_paper(row: dict) -> dict:
+    paper_id = row.get("id", "")
+    source = row.get("source", "")
+    source_ids = {}
+    if source == "arxiv" and paper_id:
+        source_ids["arxiv_id"] = paper_id
+    return ensure_schema(
+        {
+            "id": paper_id,
+            "source": source,
+            "source_ids": source_ids,
+            "title": row.get("title", ""),
+            "authors": [row.get("authors", "")] if row.get("authors") else [],
+            "published_date": row.get("published_date", ""),
+            "venue_or_status": row.get("venue_or_status", ""),
+            "primary_topic": row.get("primary_topic", ""),
+            "secondary_topics": [
+                item.strip()
+                for item in row.get("secondary_topics", "").split(";")
+                if item.strip()
+            ],
+            "priority": row.get("priority", ""),
+            "fit_score": row.get("fit_score", ""),
+            "interestingness_score": float(row.get("interestingness_score", 0.0) or 0.0),
+            "url": row.get("paper_url", ""),
+            "pdf_url": row.get("pdf_url", ""),
+            "code_url": row.get("code_url", ""),
+            "project_page": row.get("project_page", ""),
+            "summary_level": row.get("summary_level", ""),
+            "one_sentence_summary": row.get("one_sentence_summary", ""),
+            "why_it_matters": row.get("why_it_matters", ""),
+            "public_note_path": row.get("public_note_path", ""),
+        }
+    )
+
+
+def load_existing_papers() -> list[dict]:
+    jsonl_path = DATA_DIR / "papers.jsonl"
+    if jsonl_path.exists():
+        return [ensure_schema(paper) for paper in read_jsonl(jsonl_path)]
+    return [_csv_row_to_paper(row) for row in _csv_history_rows()]
+
+
 def export_public_csv(papers: list[dict]) -> None:
     rows = []
     for paper in papers:
@@ -66,6 +118,7 @@ def export_public_csv(papers: list[dict]) -> None:
                 "secondary_topics": "; ".join(paper.get("secondary_topics", [])),
                 "priority": paper.get("priority", ""),
                 "fit_score": paper.get("fit_score", ""),
+                "influence_score": paper.get("influence_score", 0.0),
                 "interestingness_score": paper.get("interestingness_score", 0.0),
                 "paper_url": paper.get("url", ""),
                 "pdf_url": paper.get("pdf_url", ""),
@@ -88,6 +141,7 @@ def export_public_csv(papers: list[dict]) -> None:
         "secondary_topics",
         "priority",
         "fit_score",
+        "influence_score",
         "interestingness_score",
         "paper_url",
         "pdf_url",
@@ -183,7 +237,7 @@ def run_daily_pipeline(push: bool = False, run_date: date | None = None, disable
     run_id = now_iso()
     os.environ["AI_PAPER_RADAR_RUN_ID"] = run_id
 
-    existing_papers = [ensure_schema(paper) for paper in read_jsonl(DATA_DIR / "papers.jsonl")]
+    existing_papers = load_existing_papers()
     dedupe_reference = [
         paper
         for paper in existing_papers

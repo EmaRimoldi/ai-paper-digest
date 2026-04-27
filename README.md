@@ -44,6 +44,8 @@ Papers tracked: `80`
 
 Every day, a small pipeline checks paper sources, research feeds, and public research signals. It deduplicates papers, scores them by relevance and likely influence, saves selected metadata and PDFs locally, and publishes short public notes for the best items.
 
+The daily public refresh is scheduled through GitHub Actions, so the repository can update even when my laptop is asleep.
+
 ## Caveat
 
 These are quick notes, not peer review. If something looks important, read the paper.
