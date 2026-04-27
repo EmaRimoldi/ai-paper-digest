@@ -34,27 +34,25 @@ image: ../../../public/assets/paper_cards/solar-rl-semi-online-long-horizon-assi
 
 ## TL;DR
 
-As Multimodal Large Language Models (MLLMs) mature, GUI agents are evolving from static interactions to complex navigation.
+To bridge this gap, we propose SOLAR-RL (Semi-Online Long-horizon Assignment Reinforcement Learning).
 
 ## What it contributes
 
-- While Reinforcement Learning (RL) has emerged as a promising paradigm for training MLLM agents on dynamic GUI tasks, its effective application faces a dilemma.
-- Standard Offline RL often relies on static step-level data, neglecting global trajectory semantics such as task completion and execution quality.
-- Conversely, Online RL captures the long-term dynamics but suffers from high interaction costs and potential environmental instability.
+- To bridge this gap, we propose SOLAR-RL (Semi-Online Long-horizon Assignment Reinforcement Learning).
+- Specifically, we reconstruct diverse rollout candidates from static data, detect the first failure point using per-step validity signals, and retroactively assign dense step-level rewards with target-aligned shaping to reflect trajectory-l…
+- It looks relevant to foundation models and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- While Reinforcement Learning (RL) has emerged as a promising paradigm for training MLLM agents on dynamic GUI tasks, its effective application faces a dilemma.
-- Standard Offline RL often relies on static step-level data, neglecting global trajectory semantics such as task completion and execution quality.
-- Conversely, Online RL captures the long-term dynamics but suffers from high interaction costs and potential environmental instability.
+- Extensive experiments demonstrate that SOLAR-RL significantly improves long-horizon task completion rates and robustness compared to strong baselines, offering a sample-…
 
 ## Method in brief
 
-As Multimodal Large Language Models (MLLMs) mature, GUI agents are evolving from static interactions to complex navigation.
+Specifically, we reconstruct diverse rollout candidates from static data, detect the first failure point using per-step validity signals, and retroactively assign dense step-level rewards with target-aligned shaping to reflect trajectory-l…
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+Specifically, we reconstruct diverse rollout candidates from static data, detect the first failure point using per-step validity signals, and retroactively assign dense step-level rewards with target-aligned shaping to…
 
 ## Links
 

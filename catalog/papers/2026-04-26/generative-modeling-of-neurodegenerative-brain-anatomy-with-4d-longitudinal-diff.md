@@ -26,27 +26,25 @@ image: ../../../public/assets/paper_cards/generative-modeling-of-neurodegenerati
 
 ## TL;DR
 
-Understanding and predicting the progression of neurodegenerative diseases remains a major challenge in medical AI, with significant implications for early diagnosis, disease moni…
+To address this problem, we propose a novel 4D (3DxT) diffusion-based generative framework that effectively models and synthesizes longitudinal brain anatomy over time, conditione…
 
 ## What it contributes
 
-- However, most available longitudinal neuroimaging datasets are temporally sparse with a few follow-up scans per subject.
-- This scarcity of temporal data limits our ability to model and accurately capture the continuous anatomical changes related to disease progression in individua…
-- To address this problem, we propose a novel 4D (3DxT) diffusion-based generative framework that effectively models and synthesizes longitudinal brain anatomy o…
+- To address this problem, we propose a novel 4D (3DxT) diffusion-based generative framework that effectively models and synthesizes longitudinal brain anatomy over time, conditioned on available clinical variables such a…
+- We validate our model through both synthetic sequence generation and downstream longitudinal disease classification, as well as brain segmentation.
+- It looks relevant to neuroai and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- However, most available longitudinal neuroimaging datasets are temporally sparse with a few follow-up scans per subject.
-- This scarcity of temporal data limits our ability to model and accurately capture the continuous anatomical changes related to disease progression in individua…
-- To address this problem, we propose a novel 4D (3DxT) diffusion-based generative framework that effectively models and synthesizes longitudinal brain anatomy o…
+- Experimental results demonstrate that our method excels at generating longitudinal sequences with preserved anatomical structure and shape, outperforming state-of-theart…
 
 ## Method in brief
 
-This scarcity of temporal data limits our ability to model and accurately capture the continuous anatomical changes related to disease progression in individual subjects.
+We validate our model through both synthetic sequence generation and downstream longitudinal disease classification, as well as brain segmentation.
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+Understanding and predicting the progression of neurodegenerative diseases remains a major challenge in medical AI, with significant implications for early diagnosis, disease monitoring, and treatment planning.
 
 ## Links
 

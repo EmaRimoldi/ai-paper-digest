@@ -23,28 +23,28 @@ links:
   pdf: https://arxiv.org/pdf/2604.22715v1
   code: ''
   project: ''
-image: ../../../public/assets/paper_cards/atrs-adaptive-trajectory-re-splitting-via-a-shared-neural-policy-for-parallel-op.svg
+image: ../../../assets/paper_cards/atrs-adaptive-trajectory-re-splitting-via-a-shared-neural-policy-for-parallel-op.svg
 ---
 
 # ATRS: Adaptive Trajectory Re-splitting via a Shared Neural Policy for Parallel Optimization
 
-![Paper card](../../../public/assets/paper_cards/atrs-adaptive-trajectory-re-splitting-via-a-shared-neural-policy-for-parallel-op.svg)
+![Paper card](../../../assets/paper_cards/atrs-adaptive-trajectory-re-splitting-via-a-shared-neural-policy-for-parallel-op.svg)
 
 ## TL;DR
 
-Parallel trajectory optimization via the Alternating Direction Method of Multipliers (ADMM) has emerged as a scalable approach to long-horizon motion planning.
+To this end, we propose ATRS, a novel framework that embeds a shared Deep Reinforcement Learning policy into the parallel ADMM loop.
 
 ## What it contributes
 
-- However, existing frameworks typically decompose the problem into parallel subproblems based on a predefined fixed structure.
-- Such structural rigidity often causes optimization stagnation in highly constrained regions, where a few lagging subproblems delay global convergence.
-- A natural remedy is to adaptively re-split these stagnating segments online.
+- To this end, we propose ATRS, a novel framework that embeds a shared Deep Reinforcement Learning policy into the parallel ADMM loop.
+- Parallel trajectory optimization via the Alternating Direction Method of Multipliers (ADMM) has emerged as a scalable approach to long-horizon motion planning.
+- It looks relevant to agents and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- However, existing frameworks typically decompose the problem into parallel subproblems based on a predefined fixed structure.
-- Such structural rigidity often causes optimization stagnation in highly constrained regions, where a few lagging subproblems delay global convergence.
-- A natural remedy is to adaptively re-split these stagnating segments online.
+- To mitigate this, recent solvers exploit specific problem structures to achieve linear time complexityO(N).
+- Existing L2O methods have achieved notable progress in parameter tuning and solver warm-starting for problems with fixed dimensions.
+- Benchmarks and real-world experiments validate that the lightweight policy enables faster convergence and real-time onboard deployment without sim-to-real degradation.
 
 ## Method in brief
 
@@ -52,7 +52,7 @@ Parallel trajectory optimization via the Alternating Direction Method of Multipl
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+However, existing frameworks typically decompose the problem into parallel subproblems based on a predefined fixed structure.
 
 ## Links
 

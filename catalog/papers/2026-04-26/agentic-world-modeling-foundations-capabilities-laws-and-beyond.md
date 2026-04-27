@@ -64,19 +64,17 @@ image: ../../../public/assets/paper_cards/agentic-world-modeling-foundations-cap
 
 ## TL;DR
 
-As AI systems move from generating text to accomplishing goals through sustained interaction, the ability to model environment dynamics becomes a central bottleneck.
+We introduce a "levels x laws" taxonomy organized along two axes.
 
 ## What it contributes
 
-- Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the term world mode…
 - We introduce a "levels x laws" taxonomy organized along two axes.
-- The first defines three capability levels: L1 Predictor, which learns one-step local transition operators; L2 Simulator, which composes them into multi-step, a…
+- As AI systems move from generating text to accomplishing goals through sustained interaction, the ability to model environment dynamics becomes a central bottleneck.
+- It looks relevant to agents and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the term world mode…
-- We introduce a "levels x laws" taxonomy organized along two axes.
-- The first defines three capability levels: L1 Predictor, which learns one-step local transition operators; L2 Simulator, which composes them into multi-step, a…
+- Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the term world model carries…
 
 ## Method in brief
 
@@ -84,7 +82,7 @@ As AI systems move from generating text to accomplishing goals through sustained
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+We analyze methods, failure modes, and evaluation practices across level-regime pairs, propose decision-centric evaluation principles and a minimal reproducible evaluation package, and outline architectural guidance, op…
 
 ## Links
 

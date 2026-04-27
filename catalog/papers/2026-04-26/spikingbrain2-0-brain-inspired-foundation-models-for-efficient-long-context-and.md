@@ -41,27 +41,25 @@ image: ../../../public/assets/paper_cards/spikingbrain2-0-brain-inspired-foundat
 
 ## TL;DR
 
-Scaling context length is reshaping large-model development, yet full-attention Transformers suffer from prohibitive computation and inference bottlenecks at long sequences.
+We introduce SpikingBrain2.0 (SpB2.0), a 5B model that advances both architecture and training efficiency of its predecessor.
 
 ## What it contributes
 
-- A key challenge is to design foundation models that maintain performance and long-context efficiency with minimal training overhead.
 - We introduce SpikingBrain2.0 (SpB2.0), a 5B model that advances both architecture and training efficiency of its predecessor.
-- Our contributions are two-fold. (1) Architectural Innovation: We propose Dual-Space Sparse Attention (DSSA), an inter-layer hybrid of Sparse Softmax Attention…
+- SpB2.0 further supports dual quantization paths: INT8-Spiking coding enables sparse event-driven computation, while FP8 coding accelerates inference on modern GPUs. (2) Enhanced Training Strategy: We develop an optimized Transformer-to-Hyb…
+- It looks relevant to foundation models and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- A key challenge is to design foundation models that maintain performance and long-context efficiency with minimal training overhead.
-- We introduce SpikingBrain2.0 (SpB2.0), a 5B model that advances both architecture and training efficiency of its predecessor.
-- Our contributions are two-fold. (1) Architectural Innovation: We propose Dual-Space Sparse Attention (DSSA), an inter-layer hybrid of Sparse Softmax Attention…
+- SpB2.0 achieves a 10.13x TTFT speedup at 4M context and supports over 10M tokens on 8 A100 GPUs under vLLM, where full-attention models exceed memory limits.
 
 ## Method in brief
 
-Scaling context length is reshaping large-model development, yet full-attention Transformers suffer from prohibitive computation and inference bottlenecks at long sequences.
+SpB2.0 further supports dual quantization paths: INT8-Spiking coding enables sparse event-driven computation, while FP8 coding accelerates inference on modern GPUs. (2) Enhanced Training Strategy: We develop an optimized Transformer-to-Hyb…
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+A key challenge is to design foundation models that maintain performance and long-context efficiency with minimal training overhead.
 
 ## Links
 

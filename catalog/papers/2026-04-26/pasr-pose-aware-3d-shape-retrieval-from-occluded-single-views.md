@@ -28,27 +28,25 @@ image: ../../../public/assets/paper_cards/pasr-pose-aware-3d-shape-retrieval-fro
 
 ## TL;DR
 
-Single-view 3D shape retrieval is a fundamental yet challenging task that is increasingly important with the growth of available 3D data.
+To address this problem, we propose Pose-Aware 3D Shape Retrieval (PASR), a framework that formulates retrieval as a feature-level analysis-by-synthesis problem by distilling know…
 
 ## What it contributes
 
-- Existing approaches largely fall into two categories: those using contrastive learning to map point cloud features into existing vision-language spaces and tho…
-- However, these feed-forward, holistic alignments are often difficult to interpret, which in turn limits their robustness and generalization to real-world appli…
-- To address this problem, we propose Pose-Aware 3D Shape Retrieval (PASR), a framework that formulates retrieval as a feature-level analysis-by-synthesis proble…
+- To address this problem, we propose Pose-Aware 3D Shape Retrieval (PASR), a framework that formulates retrieval as a feature-level analysis-by-synthesis problem by distilling knowledge from a 2D foundation model (DINOv3…
+- Existing approaches largely fall into two categories: those using contrastive learning to map point cloud features into existing vision-language spaces and those that learn a common embedding space for 2D images and 3D shapes.
+- It looks relevant to safety alignment and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- Existing approaches largely fall into two categories: those using contrastive learning to map point cloud features into existing vision-language spaces and tho…
-- However, these feed-forward, holistic alignments are often difficult to interpret, which in turn limits their robustness and generalization to real-world appli…
-- To address this problem, we propose Pose-Aware 3D Shape Retrieval (PASR), a framework that formulates retrieval as a feature-level analysis-by-synthesis proble…
+- PASR substantially outperforms existing methods on both clean and occluded 3D shape retrieval datasets by a wide margin.
 
 ## Method in brief
 
-Existing approaches largely fall into two categories: those using contrastive learning to map point cloud features into existing vision-language spaces and those that learn a common embedding space for 2D images and 3D…
+Existing approaches largely fall into two categories: those using contrastive learning to map point cloud features into existing vision-language spaces and those that learn a common embedding space for 2D images and 3D shapes.
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+However, these feed-forward, holistic alignments are often difficult to interpret, which in turn limits their robustness and generalization to real-world applications.
 
 ## Links
 

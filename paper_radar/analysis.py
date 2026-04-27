@@ -9,6 +9,8 @@ from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
 
+from pypdf import PdfReader
+
 from .config import CATALOG_DIR, REPORTS_DIR, now_iso
 from .storage import write_text
 
@@ -489,32 +491,245 @@ def truncate(text: str, limit: int) -> str:
     return cleaned[: limit - 1].rstrip() + "…"
 
 
+def _pdf_path(paper: dict) -> Path | None:
+    local_path = clean_whitespace(paper.get("local_pdf_path", ""))
+    if not local_path:
+        return None
+    path = Path(local_path)
+    if not path.is_absolute():
+        path = Path(__file__).resolve().parents[1] / path
+    return path if path.exists() else None
+
+
+def extract_pdf_text(paper: dict, max_pages: int = 8) -> str:
+    pdf_path = _pdf_path(paper)
+    if not pdf_path:
+        return ""
+    try:
+        reader = PdfReader(str(pdf_path))
+        text_parts = []
+        for page in reader.pages[:max_pages]:
+            text = clean_whitespace(page.extract_text() or "")
+            if text:
+                text_parts.append(text)
+        return _clean_pdf_text("\n".join(text_parts))
+    except Exception:
+        return ""
+
+
+def _clean_pdf_text(text: str) -> str:
+    cleaned = text or ""
+    cleaned = cleaned.replace("§", " ")
+    cleaned = re.sub(r"([A-Za-z])-\s+([A-Za-z])", r"\1\2", cleaned)
+    cleaned = re.sub(r"arXiv:[^\n ]+", " ", cleaned)
+    cleaned = re.sub(r"\bPreprint\b", " ", cleaned, flags=re.I)
+    cleaned = re.sub(r"Disclaimer:[^.]+(?:\.)?", " ", cleaned, flags=re.I)
+    cleaned = re.sub(r"https?://\S+", " ", cleaned)
+    cleaned = re.sub(r"\b(?:Introduction|Contents|Table of Contents)\b", " ", cleaned, flags=re.I)
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return clean_whitespace(cleaned)
+
+
+def _dedupe_sentences(sentences: list[str], limit: int = 6) -> list[str]:
+    unique: list[str] = []
+    seen_normalized: set[str] = set()
+    for sentence in sentences:
+        normalized = normalize_title(sentence)
+        if not normalized or normalized in seen_normalized:
+            continue
+        seen_normalized.add(normalized)
+        unique.append(sentence)
+        if len(unique) >= limit:
+            break
+    return unique
+
+
+def _pick_sentences(sentences: list[str], keywords: tuple[str, ...], limit: int = 3) -> list[str]:
+    chosen = [
+        sentence
+        for sentence in sentences
+        if any(keyword in sentence.lower() for keyword in keywords)
+    ]
+    return _dedupe_sentences(chosen, limit=limit)
+
+
+def _fallback_slice(sentences: list[str], start: int, stop: int, limit: int = 3) -> list[str]:
+    return _dedupe_sentences(sentences[start:stop], limit=limit)
+
+
+def _is_useful_sentence(sentence: str) -> bool:
+    cleaned = clean_whitespace(sentence)
+    lowered = cleaned.lower()
+    if len(cleaned) < 50:
+        return False
+    blocked_terms = (
+        "arxiv:",
+        "preprint",
+        "table of contents",
+        "contents",
+        "homepage:",
+        "github repo:",
+        "contact:",
+        "university of",
+        "institute of",
+        "school of",
+        "department of",
+    )
+    if any(term in lowered for term in blocked_terms):
+        return False
+    if re.search(r"\b\d+(?:\.\d+){1,}\b", cleaned):
+        return False
+    if re.search(r"\b(?:introduction|preliminaries|motivation|experiments|conclusion)\b.*\b(?:\d+(?:\.\d+)?\b)", lowered):
+        return False
+    if re.fullmatch(r"[\d.\s]+", cleaned):
+        return False
+    if cleaned.count("§") >= 1:
+        return False
+    if len(re.findall(r"\b[A-Z][a-z]+\b", cleaned)) >= 8 and cleaned.count(",") >= 4:
+        return False
+    return True
+
+
+def _distinct_from(sentence: str, others: list[str], threshold: float = 0.92) -> bool:
+    candidate = normalize_title(sentence)
+    if not candidate:
+        return False
+    for other in others:
+        if not other:
+            continue
+        if similarity(sentence, other) >= threshold:
+            return False
+    return True
+
+
+def _derive_contribution_sentences(sentences: list[str]) -> list[str]:
+    chosen = _pick_sentences(
+        sentences,
+        (
+            "we propose",
+            "we present",
+            "we introduce",
+            "this paper",
+            "this work",
+            "our framework",
+            "our method",
+            "we study",
+            "we analyze",
+            "we synthesize",
+        ),
+        limit=3,
+    )
+    return chosen or _fallback_slice(sentences, 0, 3, limit=3)
+
+
+def _derive_method_sentence(primary_sentences: list[str], backup_sentences: list[str], avoid: list[str]) -> str:
+    for candidate_pool in (primary_sentences, backup_sentences):
+        chosen = _pick_sentences(
+            candidate_pool,
+            (
+                "method",
+                "approach",
+                "framework",
+                "architecture",
+                "algorithm",
+                "pipeline",
+                "using ",
+                "through ",
+                "via ",
+                "we synthesize",
+                "we formulate",
+                "by aligning",
+                "taxonomy",
+            ),
+            limit=6,
+        )
+        for item in chosen:
+            if _distinct_from(item, avoid):
+                return truncate(item, 240)
+    return "unknown"
+
+
+def _derive_result_sentences(primary_sentences: list[str], backup_sentences: list[str], avoid: list[str]) -> list[str]:
+    for candidate_pool in (primary_sentences, backup_sentences):
+        chosen = _pick_sentences(
+            candidate_pool,
+            (
+                "results show",
+                "we show",
+                "we demonstrate",
+                "outperform",
+                "achieve",
+                "improve",
+                "reduce",
+                "increase",
+                "benchmark",
+                "experiments",
+                "evaluation",
+                "we analyze",
+                "we summarize",
+                "we find",
+            ),
+            limit=6,
+        )
+        distinct = [item for item in chosen if _distinct_from(item, avoid)]
+        if distinct:
+            return distinct[:3]
+    fallback = _fallback_slice(primary_sentences or backup_sentences, 1, 5, limit=4)
+    return [item for item in fallback if _distinct_from(item, avoid)][:3]
+
+
+def _derive_caveat_sentence(sentences: list[str], used_pdf: bool) -> str:
+    caveat = _pick_sentences(
+        sentences,
+        (
+            "limitation",
+            "limitations",
+            "however",
+            "future work",
+            "challenge",
+            "fails",
+            "failure",
+        ),
+        limit=1,
+    )
+    if caveat:
+        return truncate(caveat[0], 220)
+    if used_pdf:
+        return "Fast note from local PDF text. Verify claims and limitations directly in the paper."
+    return "Summary based on abstract/metadata only."
+
+
 def summarize_paper(paper: dict) -> dict:
     paper = ensure_schema(paper)
-    sentences = split_sentences(paper.get("abstract", ""))
-    if paper.get("abstract"):
+    pdf_text = extract_pdf_text(paper)
+    pdf_sentences = [sentence for sentence in split_sentences(pdf_text) if _is_useful_sentence(sentence)]
+    abstract_sentences = [sentence for sentence in split_sentences(paper.get("abstract", "")) if _is_useful_sentence(sentence)]
+    used_pdf = len(pdf_sentences) >= 3
+    primary_sentences = abstract_sentences or pdf_sentences
+    backup_sentences = pdf_sentences or abstract_sentences
+    sentences = primary_sentences or backup_sentences
+    if used_pdf:
+        paper["summary_level"] = "pdf_summary"
+    elif paper.get("abstract"):
         paper["summary_level"] = "abstract_summary"
     else:
         paper["summary_level"] = "metadata_only"
     if sentences:
-        first = truncate(sentences[0], 180)
-        method_sentence = next(
-            (sentence for sentence in sentences if any(term in sentence.lower() for term in ("method", "approach", "framework", "model"))),
-            sentences[min(1, len(sentences) - 1)],
+        contribution_sentences = _derive_contribution_sentences(primary_sentences)
+        first = truncate(contribution_sentences[0] if contribution_sentences else primary_sentences[0], 180)
+        method_sentence = _derive_method_sentence(primary_sentences, backup_sentences, avoid=contribution_sentences)
+        result_sentences = _derive_result_sentences(
+            primary_sentences,
+            backup_sentences,
+            avoid=contribution_sentences + [method_sentence],
         )
-        result_sentence = next(
-            (
-                sentence
-                for sentence in sentences
-                if any(term in sentence.lower() for term in ("result", "achieve", "outperform", "show", "demonstrate"))
-            ),
-            sentences[min(2, len(sentences) - 1)],
-        )
+        result_sentence = truncate(result_sentences[0], 220) if result_sentences else "unknown"
         paper["one_sentence_summary"] = first
-        paper["core_contribution"] = truncate(first, 220)
-        paper["method"] = truncate(method_sentence, 220)
-        paper["main_result_or_claim"] = truncate(result_sentence, 220)
-        paper["key_results"] = [truncate(sentence, 160) for sentence in sentences[1:4]] or [truncate(first, 160)]
+        paper["core_contribution"] = truncate(contribution_sentences[0], 220)
+        paper["method"] = method_sentence
+        paper["main_result_or_claim"] = result_sentence
+        paper["key_results"] = [truncate(sentence, 170) for sentence in result_sentences[:3]] or [truncate(first, 170)]
+        paper["limitations_or_caveats"] = _derive_caveat_sentence(sentences, used_pdf=used_pdf)
     else:
         paper["one_sentence_summary"] = truncate(
             f"{paper.get('title', 'This paper')} appears relevant, but the summary is based on metadata only.",
@@ -524,9 +739,6 @@ def summarize_paper(paper: dict) -> dict:
         paper["method"] = "unknown"
         paper["main_result_or_claim"] = "unknown"
         paper["key_results"] = ["Summary based on abstract/metadata only."]
-    if paper.get("local_pdf_path"):
-        paper["limitations_or_caveats"] = paper.get("limitations_or_caveats") or "Fast note. Verify claims directly in the paper before relying on them."
-    else:
         paper["limitations_or_caveats"] = "Summary based on abstract/metadata only."
     topic_title = paper.get("primary_topic", "").replace("_", " ")
     paper["why_it_matters"] = truncate(
@@ -610,4 +822,3 @@ def grouped_by_topic(papers: list[dict]) -> dict[str, list[dict]]:
     for paper in papers:
         grouped[paper.get("primary_topic", "foundation_models")].append(paper)
     return grouped
-

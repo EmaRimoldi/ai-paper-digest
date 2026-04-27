@@ -51,6 +51,24 @@ def _catalog_relative_path(path_str: str) -> str:
     return path.as_posix()
 
 
+def _paper_contribution_lines(paper: dict) -> list[str]:
+    candidates = [
+        paper.get("core_contribution", ""),
+        paper.get("method", ""),
+        paper.get("why_it_matters", ""),
+    ]
+    unique: list[str] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        normalized = clean_whitespace(candidate)
+        key = normalized.lower()
+        if not normalized or normalized == "unknown" or key in seen:
+            continue
+        seen.add(key)
+        unique.append(normalized)
+    return unique[:3] or ["Summary based on abstract/metadata only."]
+
+
 def generate_visual_assets(top_papers: list[dict], all_papers: list[dict], taxonomy: dict, run_date: date) -> None:
     assets_dir = PUBLIC_DIR / "assets"
     topic_cards_dir = assets_dir / "topic_cards"
@@ -167,7 +185,8 @@ def build_catalog(top_papers: list[dict], all_papers: list[dict], taxonomy: dict
     docs_run_dir.mkdir(parents=True, exist_ok=True)
     for paper in top_papers[:10]:
         slug = slugify(paper["title"])
-        card_path = f"../../../public/assets/paper_cards/{slug}.svg"
+        catalog_card_path = f"../../../public/assets/paper_cards/{slug}.svg"
+        docs_card_path = f"../../../assets/paper_cards/{slug}.svg"
         frontmatter = {
             "title": paper.get("title", ""),
             "authors": paper.get("authors", []),
@@ -182,16 +201,16 @@ def build_catalog(top_papers: list[dict], all_papers: list[dict], taxonomy: dict
                 "code": paper.get("code_url", ""),
                 "project": paper.get("project_page", ""),
             },
-            "image": card_path,
+            "image": catalog_card_path,
         }
-        lines = [
+        catalog_lines = [
             "---",
             yaml.safe_dump(frontmatter, sort_keys=False, allow_unicode=False).strip(),
             "---",
             "",
             f"# {paper.get('title', '')}",
             "",
-            f"![Paper card]({card_path})",
+            f"![Paper card]({catalog_card_path})",
             "",
             "## TL;DR",
             "",
@@ -200,19 +219,33 @@ def build_catalog(top_papers: list[dict], all_papers: list[dict], taxonomy: dict
             "## What it contributes",
             "",
         ]
-        contribution_lines = paper.get("key_results")[:3] or [paper.get("core_contribution") or "Summary based on abstract/metadata only."]
-        for item in contribution_lines[:3]:
-            lines.append(f"- {item}")
-        lines.extend(
+        docs_frontmatter = {**frontmatter, "image": docs_card_path}
+        docs_lines = [
+            "---",
+            yaml.safe_dump(docs_frontmatter, sort_keys=False, allow_unicode=False).strip(),
+            "---",
+            "",
+            f"# {paper.get('title', '')}",
+            "",
+            f"![Paper card]({docs_card_path})",
+            "",
+            "## TL;DR",
+            "",
+            paper.get("one_sentence_summary", "Summary based on abstract/metadata only."),
+            "",
+            "## What it contributes",
+            "",
+        ]
+        for item in _paper_contribution_lines(paper):
+            catalog_lines.append(f"- {item}")
+            docs_lines.append(f"- {item}")
+        shared_tail = [
             [
                 "",
                 "## Key results",
                 "",
-            ]
-        )
-        for item in paper.get("key_results", [])[:3] or ["Summary based on abstract/metadata only."]:
-            lines.append(f"- {item}")
-        lines.extend(
+            ],
+            [f"- {item}" for item in paper.get("key_results", [])[:3] or ["Summary based on abstract/metadata only."]],
             [
                 "",
                 "## Method in brief",
@@ -228,14 +261,17 @@ def build_catalog(top_papers: list[dict], all_papers: list[dict], taxonomy: dict
                 f"- Paper: {paper.get('url', '')}",
                 f"- PDF: {paper.get('pdf_url', '')}",
                 f"- Code/project: {paper.get('code_url') or paper.get('project_page') or ''}",
-            ]
-        )
+            ],
+        ]
+        for block in shared_tail:
+            catalog_lines.extend(block)
+            docs_lines.extend(block)
         note_path = note_path_for_paper(run_date, paper)
-        write_text(note_path, "\n".join(lines) + "\n")
+        write_text(note_path, "\n".join(catalog_lines) + "\n")
         relative_note = note_path.relative_to(ROOT).as_posix()
         paper["public_note_path"] = relative_note
         paper["public_card_path"] = f"public/assets/paper_cards/{slug}.svg"
-        write_text(docs_run_dir / f"{slug}.md", "\n".join(lines) + "\n")
+        write_text(docs_run_dir / f"{slug}.md", "\n".join(docs_lines) + "\n")
 
     grouped = grouped_by_topic(all_papers)
     for topic_slug, meta in taxonomy.get("topics", {}).items():

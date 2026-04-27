@@ -19,36 +19,34 @@ links:
   pdf: https://arxiv.org/pdf/2604.22550v1
   code: ''
   project: ''
-image: ../../../public/assets/paper_cards/armssl-adversarial-robust-black-box-watermarking-for-self-supervised-learning-pr.svg
+image: ../../../assets/paper_cards/armssl-adversarial-robust-black-box-watermarking-for-self-supervised-learning-pr.svg
 ---
 
 # ArmSSL: Adversarial Robust Black-Box Watermarking for Self-Supervised Learning Pre-trained Encoders
 
-![Paper card](../../../public/assets/paper_cards/armssl-adversarial-robust-black-box-watermarking-for-self-supervised-learning-pr.svg)
+![Paper card](../../../assets/paper_cards/armssl-adversarial-robust-black-box-watermarking-for-self-supervised-learning-pr.svg)
 
 ## TL;DR
 
-Self-supervised learning (SSL) encoders are invaluable intellectual property (IP).
+We propose ArmSSL, an SSL watermarking framework that assures black-box verifiability and adversarial robustness while preserving utility.
 
 ## What it contributes
 
-- However, no existing SSL watermarking for IP protection can concurrently satisfy the following two practical requirements: (1) provide ownership verification c…
 - We propose ArmSSL, an SSL watermarking framework that assures black-box verifiability and adversarial robustness while preserving utility.
-- For verification, we introduce paired discrepancy enlargement, enforcing feature-space orthogonality between the clean and its watermark counterpart to produce…
+- For utility, a reference-guided watermark tuning strategy is designed to allow the watermark to be learned as a small side task without affecting the main task by aligning the watermarked encoder's outputs with those of the original clean…
+- It looks relevant to safety alignment and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- However, no existing SSL watermarking for IP protection can concurrently satisfy the following two practical requirements: (1) provide ownership verification c…
-- We propose ArmSSL, an SSL watermarking framework that assures black-box verifiability and adversarial robustness while preserving utility.
-- For verification, we introduce paired discrepancy enlargement, enforcing feature-space orthogonality between the clean and its watermark counterpart to produce…
+- Extensive experiments across five mainstream SSL frameworks and nine benchmark datasets, along with end-to-end comparisons with SOTAs, demonstrate that ArmSSL achieves s…
 
 ## Method in brief
 
-However, no existing SSL watermarking for IP protection can concurrently satisfy the following two practical requirements: (1) provide ownership verification capability under black-box suspect model access once the stol…
+For utility, a reference-guided watermark tuning strategy is designed to allow the watermark to be learned as a small side task without affecting the main task by aligning the watermarked encoder's outputs with those of the original clean…
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+However, no existing SSL watermarking for IP protection can concurrently satisfy the following two practical requirements: (1) provide ownership verification capability under black-box suspect model access once the stol…
 
 ## Links
 

@@ -4,6 +4,6 @@
   <text x="48" y="74" fill="#fff7ed" font-size="18" font-family="Trebuchet MS, sans-serif">2026-04-26 · Skim</text>
   <text x="48" y="136" fill="#f8fafc" font-size="34" font-family="Georgia, serif">PASR: Pose-Aware 3D Shape Retrieval from Occluded Single Views</text>
   <text x="48" y="184" fill="#cbd5e1" font-size="20" font-family="Trebuchet MS, sans-serif">Safety Alignment</text>
-  <text x="48" y="240" fill="#e5e7eb" font-size="22" font-family="Trebuchet MS, sans-serif">Single-view 3D shape retrieval is a fundamental yet challenging task that is increasingly important with the growth of…</text>
+  <text x="48" y="240" fill="#e5e7eb" font-size="22" font-family="Trebuchet MS, sans-serif">To address this problem, we propose Pose-Aware 3D Shape Retrieval (PASR), a framework that formulates retrieval as a fe…</text>
   <text x="48" y="340" fill="#fdba74" font-size="20" font-family="Trebuchet MS, sans-serif">It looks relevant to safety alignment and is a plausible candidate for a first-pass read.</text>
 </svg>

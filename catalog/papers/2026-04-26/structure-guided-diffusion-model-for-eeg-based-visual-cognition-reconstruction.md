@@ -26,19 +26,19 @@ image: ../../../public/assets/paper_cards/structure-guided-diffusion-model-for-e
 
 ## TL;DR
 
-Objective: Decoding visual information from electroencephalography (EEG) is an important problem in neuroscience and brain-computer interface (BCI) research.
+We propose a Structure-Guided Diffusion Model (SGDM) that incorporates explicit structural information for EEG-based visual reconstruction.
 
 ## What it contributes
 
-- Existing methods are largely restricted to natural images and categorical representations, with limited capacity to capture structural features and to differen…
 - We propose a Structure-Guided Diffusion Model (SGDM) that incorporates explicit structural information for EEG-based visual reconstruction.
-- Approach: SGDM is evaluated on the Kilogram abstract visual object dataset and the THINGS natural image dataset using a two-stage generative mechanism.
+- Existing methods are largely restricted to natural images and categorical representations, with limited capacity to capture structural features and to differentiate objective perception from subjective cognition.
+- It looks relevant to neuroai and is a plausible candidate for a first-pass read.
 
 ## Key results
 
-- Existing methods are largely restricted to natural images and categorical representations, with limited capacity to capture structural features and to differen…
-- We propose a Structure-Guided Diffusion Model (SGDM) that incorporates explicit structural information for EEG-based visual reconstruction.
-- Approach: SGDM is evaluated on the Kilogram abstract visual object dataset and the THINGS natural image dataset using a two-stage generative mechanism.
+- Results: SGDM outperforms existing methods on both abstract and natural image datasets.
+- Reconstructed images achieve higher fidelity in low-level visual features and semantic representations, indicating improved decoding accuracy and strong generalization a…
+- This supports BCIs with increased degrees of freedom for intention decoding and more flexible brain-to-machine communication.
 
 ## Method in brief
 
@@ -46,7 +46,7 @@ Existing methods are largely restricted to natural images and categorical repres
 
 ## Caveats
 
-Summary based on abstract/metadata only.
+Fast note from local PDF text. Verify claims and limitations directly in the paper.
 
 ## Links
 
