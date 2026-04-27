@@ -20,5 +20,5 @@ fit_thresholds:
 
 diversity:
   max_same_primary_topic_in_top10: 3
+  max_same_primary_topic_in_daily_selection: 2
   repetition_penalty: 0.8
-

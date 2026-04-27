@@ -176,7 +176,7 @@ def _run_publish_script(push: bool) -> None:
     subprocess.run(cmd, cwd=ROOT, check=True)
 
 
-def run_daily_pipeline(push: bool = False, run_date: date | None = None) -> dict:
+def run_daily_pipeline(push: bool = False, run_date: date | None = None, disable_push: bool = False) -> dict:
     initialize_workspace()
     configs = load_all_configs()
     current_date = run_date or today_local()
@@ -254,8 +254,9 @@ def run_daily_pipeline(push: bool = False, run_date: date | None = None) -> dict
         "selected_count": len(selected),
         "candidate_count": len(deduped_candidates),
     }
-    if push or configs["github"].get("github", {}).get("auto_push", False):
-        _run_publish_script(push=push)
+    should_push = push or (configs["github"].get("github", {}).get("auto_push", False) and not disable_push)
+    if push or should_push:
+        _run_publish_script(push=should_push)
     return validation_report
 
 
@@ -265,7 +266,7 @@ def cli_main() -> None:
     parser.add_argument("--no-push", action="store_true", help="Disable push even if config enables it.")
     args = parser.parse_args()
     push = args.push and not args.no_push
-    report = run_daily_pipeline(push=push)
+    report = run_daily_pipeline(push=push, disable_push=args.no_push)
     print(f"Run date: {report['run_date']}")
     print(f"Candidates: {report['candidate_count']}")
     print(f"Selected: {report['selected_count']}")

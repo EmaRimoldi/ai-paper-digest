@@ -35,8 +35,8 @@ research_interests:
 output_preferences:
   daily_email_digest: true
   public_github_catalog: true
-  max_daily_highlights: 10
-  max_email_items: 10
+  max_daily_highlights: 5
+  max_email_items: 5
   max_pdf_downloads_per_day: 20
   max_deep_summaries_per_day: 15
   include_pdf_links: true
@@ -45,4 +45,3 @@ output_preferences:
   include_public_catalog_pages: true
   include_safe_images: true
   prefer_gmail_draft_before_auto_send: true
-

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
-  <rect width="960" height="420" rx="28" fill="#1f2937"/>
-  <rect x="24" y="24" width="912" height="372" rx="24" fill="none" stroke="#38bdf8" stroke-width="3"/>
+  <rect width="960" height="420" rx="28" fill="#172554"/>
+  <rect x="24" y="24" width="912" height="372" rx="24" fill="none" stroke="#22c55e" stroke-width="3"/>
   <text x="48" y="74" fill="#fff7ed" font-size="18" font-family="Trebuchet MS, sans-serif">2026-04-26 · Must read</text>
   <text x="48" y="136" fill="#f8fafc" font-size="34" font-family="Georgia, serif">ATRS: Adaptive Trajectory Re-splitting via a Shared Neural Policy for Parallel Optimization</text>
   <text x="48" y="184" fill="#cbd5e1" font-size="20" font-family="Trebuchet MS, sans-serif">Agents</text>

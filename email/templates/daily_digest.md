@@ -1,8 +1,8 @@
-Subject: AI Paper Radar — Top 10 — {{ date }}
+Subject: AI Paper Radar — Top 5 — {{ date }}
 
 # AI Paper Radar — {{ date }}
 
-## Top 10 most interesting
+## Top 5 most influential
 
 {{ top_items }}
 
@@ -17,4 +17,3 @@ Subject: AI Paper Radar — Top 10 — {{ date }}
 ## Source run log
 
 {{ source_log }}
-

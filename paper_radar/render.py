@@ -62,6 +62,11 @@ def _summary_source_label(level: str) -> str:
     }.get(level, level or "unknown")
 
 
+def _daily_selection_label(top_papers: list[dict]) -> str:
+    count = len(top_papers)
+    return f"Top {count}" if count else "Daily Selection"
+
+
 def _section_summary_rows(paper: dict) -> list[tuple[str, str]]:
     summaries = paper.get("section_summaries") or {}
     result_fallback = clean_whitespace(" ".join(paper.get("key_results", [])[:2])) or paper.get("main_result_or_claim", "")
@@ -140,6 +145,7 @@ def generate_visual_assets(top_papers: list[dict], all_papers: list[dict], taxon
     for directory in (assets_dir, topic_cards_dir, paper_cards_dir, assets_dir / "figures_safe"):
         directory.mkdir(parents=True, exist_ok=True)
     topic_summary = topic_counts(all_papers)
+    selection_label = _daily_selection_label(top_papers)
     hero_svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -155,7 +161,7 @@ def generate_visual_assets(top_papers: list[dict], all_papers: list[dict], taxon
   <text x="95" y="105" fill="#fff7ed" font-size="18" font-family="Georgia, serif">Daily Research Radar</text>
   <text x="70" y="210" fill="#f8fafc" font-size="72" font-weight="700" font-family="Georgia, serif">AI Paper Radar</text>
   <text x="70" y="280" fill="#e2e8f0" font-size="30" font-family="'Trebuchet MS', sans-serif">Noise-to-signal monitoring for modern AI research.</text>
-  <text x="70" y="334" fill="#cbd5e1" font-size="24" font-family="'Trebuchet MS', sans-serif">Top 10 picks, short notes, topic tracking, and public-safe publishing.</text>
+  <text x="70" y="334" fill="#cbd5e1" font-size="24" font-family="'Trebuchet MS', sans-serif">{selection_label} influential papers, short notes, topic tracking, and public-safe publishing.</text>
   <text x="70" y="498" fill="#fed7aa" font-size="22" font-family="'Trebuchet MS', sans-serif">Updated {run_date.isoformat()}</text>
   <text x="70" y="536" fill="#fef3c7" font-size="22" font-family="'Trebuchet MS', sans-serif">I outsource the noise, not the thinking.</text>
 </svg>"""
@@ -186,7 +192,7 @@ def generate_visual_assets(top_papers: list[dict], all_papers: list[dict], taxon
     write_text(assets_dir / "topic_map.svg", topic_map_svg)
 
     top_lines = []
-    for index, paper in enumerate(top_papers[:10], start=1):
+    for index, paper in enumerate(top_papers, start=1):
         top_lines.append(
             f'<text x="80" y="{110 + index * 45}" fill="#f8fafc" font-size="24" font-family="Georgia, serif">{index}. {_svg_escape(truncate(paper.get("title", ""), 74))}</text>'
         )
@@ -196,7 +202,7 @@ def generate_visual_assets(top_papers: list[dict], all_papers: list[dict], taxon
     daily_top10_svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780">
   <rect width="1200" height="780" fill="#111827"/>
   <rect x="55" y="55" width="1090" height="670" rx="28" fill="#1f2937" stroke="#f97316" stroke-width="4"/>
-  <text x="80" y="105" fill="#fff7ed" font-size="44" font-family="Georgia, serif">Top 10 Most Interesting Papers</text>
+  <text x="80" y="105" fill="#fff7ed" font-size="44" font-family="Georgia, serif">{selection_label} Most Influential Papers</text>
   <text x="80" y="138" fill="#fdba74" font-size="20" font-family="Trebuchet MS, sans-serif">{run_date.isoformat()}</text>
   {''.join(top_lines)}
 </svg>"""
@@ -214,7 +220,7 @@ def generate_visual_assets(top_papers: list[dict], all_papers: list[dict], taxon
 </svg>"""
         write_text(topic_cards_dir / f"{slug}.svg", topic_card)
 
-    for index, paper in enumerate(top_papers[:10]):
+    for index, paper in enumerate(top_papers):
         fill, accent = _card_background(index)
         card = f"""<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
   <rect width="960" height="420" rx="28" fill="{fill}"/>
@@ -247,7 +253,7 @@ def build_catalog(top_papers: list[dict], all_papers: list[dict], taxonomy: dict
     run_dir.mkdir(parents=True, exist_ok=True)
     docs_run_dir = DOCS_DIR / "papers" / run_date.isoformat()
     docs_run_dir.mkdir(parents=True, exist_ok=True)
-    for paper in top_papers[:10]:
+    for paper in top_papers:
         slug = slugify(paper["title"])
         page_lines = _paper_page_lines(paper, run_date)
         note_path = note_path_for_paper(run_date, paper)
@@ -336,7 +342,7 @@ def generate_public_readme(top_papers: list[dict], all_papers: list[dict], taxon
         ]
     )
     top10_lines = []
-    for index, paper in enumerate(top_papers[:10], start=1):
+    for index, paper in enumerate(top_papers, start=1):
         note_link = paper.get("public_note_path", "")
         link = note_link
         label = f"[{paper.get('title', '')}]({link})" if link else paper.get("title", "")
@@ -363,16 +369,17 @@ def generate_digest(
     run_date: date,
     run_id: str = "",
 ) -> None:
-    subject = f"Subject: AI Paper Radar — Top 10 — {run_date.isoformat()}"
+    selection_label = _daily_selection_label(top_papers)
+    subject = f"Subject: AI Paper Radar — {selection_label} — {run_date.isoformat()}"
     lines = [
         subject,
         "",
         f"# AI Paper Radar — {run_date.isoformat()}",
         "",
-        "## Top 10 most interesting",
+        f"## {selection_label} most influential",
         "",
     ]
-    for index, paper in enumerate(top_papers[:10], start=1):
+    for index, paper in enumerate(top_papers, start=1):
         lines.extend(
             [
                 f"{index}. {paper.get('title', '')}",
@@ -391,7 +398,7 @@ def generate_digest(
     else:
         lines.append("- No verified public research feeds were configured for this run.")
     lines.extend(["", "## New catalog pages", ""])
-    for paper in top_papers[:10]:
+    for paper in top_papers:
         lines.append(f"- {paper.get('public_note_path', '')}")
     lines.extend(["", "## Source run log", ""])
     filtered_source_runs = [
@@ -407,10 +414,10 @@ def generate_digest(
     week_lines = [
         f"# AI Paper Radar — Weekly Summary — {week}",
         "",
-        "## Top 10 papers of the week",
+        f"## {selection_label} papers of the week",
         "",
     ]
-    for paper in top_papers[:10]:
+    for paper in top_papers:
         week_lines.append(f"- {paper.get('title', '')} ({paper.get('primary_topic', '').replace('_', ' ')})")
     counts = topic_counts(all_papers)
     week_lines.extend(["", "## Most active topics", ""])

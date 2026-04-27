@@ -2,7 +2,7 @@ limits:
   max_candidates_per_category: 12
   max_candidates_per_run: 80
   max_enrich_candidates: 50
-  max_daily_highlights: 10
+  max_daily_highlights: 5
   max_pdf_downloads_per_day: 20
   max_deep_summaries_per_day: 15
   taxonomy_misc_proposal_threshold: 5
@@ -10,4 +10,3 @@ limits:
   http_timeout_seconds: 30
   request_pause_seconds: 0.2
   user_agent: "ai-paper-radar/0.1"
-

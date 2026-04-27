@@ -47,6 +47,7 @@ DEFAULT_SCHEMA = {
     "fit_score": "Low",
     "priority": "Archive",
     "interestingness_score": 0.0,
+    "influence_score": 0.0,
     "novelty_signal": "unknown",
     "social_signal": "unknown",
     "evidence_type": "unknown",
@@ -458,25 +459,46 @@ def rank_papers(
     run_date: date,
 ) -> list[dict]:
     weights = scoring.get("weights", {})
+    selection_limit = int(profile.get("output_preferences", {}).get("max_daily_highlights", 10) or 10)
+    max_per_topic = scoring.get("diversity", {}).get(
+        "max_same_primary_topic_in_daily_selection",
+        2 if selection_limit <= 5 else scoring.get("diversity", {}).get("max_same_primary_topic_in_top10", 3),
+    )
     for paper in papers:
         assign_topics_to_paper(paper, taxonomy)
         fit_score_numeric = _fit_numeric(paper, profile, queries)
         novelty_label, novelty_numeric = _novelty_signal(paper)
+        importance_numeric = _importance_score(paper)
+        social_numeric = _social_numeric(paper.get("social_signal", "unknown"))
+        project_numeric = 0.8 if paper.get("code_url") or paper.get("project_page") else 0.0
+        venue_numeric = 0.8 if paper.get("venue_or_status") else 0.0
+        recency_numeric = _recency_score(paper, run_date)
+        technical_numeric = _technical_depth(paper)
         paper["novelty_signal"] = novelty_label
         paper["evidence_type"] = detect_evidence_type(paper)
         paper["fit_score"] = determine_fit_label(fit_score_numeric, scoring)
         paper["interestingness_score"] = round(
             fit_score_numeric * weights.get("topic_fit", 3.0) / 3.0
-            + _technical_depth(paper) * weights.get("technical_depth", 1.7)
+            + technical_numeric * weights.get("technical_depth", 1.7)
             + novelty_numeric * weights.get("novelty", 1.5)
-            + _importance_score(paper) * weights.get("likely_importance", 1.3)
+            + importance_numeric * weights.get("likely_importance", 1.3)
             + _abstract_quality(paper) * weights.get("abstract_quality", 1.0)
-            + _social_numeric(paper.get("social_signal", "unknown")) * weights.get("social_signal", 0.8)
-            + (0.8 if paper.get("code_url") or paper.get("project_page") else 0.0) * weights.get("code_or_project", 0.5)
-            + (0.8 if paper.get("venue_or_status") else 0.0) * weights.get("venue_signal", 0.5)
+            + social_numeric * weights.get("social_signal", 0.8)
+            + project_numeric * weights.get("code_or_project", 0.5)
+            + venue_numeric * weights.get("venue_signal", 0.5)
             + min(topic_scores((paper.get("title", "") + " " + paper.get("abstract", "")).lower()).values() or [0.0], default=0.0)
             * 0.0
-            + _recency_score(paper, run_date) * weights.get("recency", 0.7),
+            + recency_numeric * weights.get("recency", 0.7),
+            3,
+        )
+        paper["influence_score"] = round(
+            importance_numeric * weights.get("likely_importance", 1.3) * 2.4
+            + social_numeric * weights.get("social_signal", 0.8) * 1.4
+            + venue_numeric * weights.get("venue_signal", 0.5) * 1.2
+            + project_numeric * weights.get("code_or_project", 0.5)
+            + technical_numeric * 0.7
+            + fit_score_numeric * 0.4
+            + recency_numeric * 0.3,
             3,
         )
         paper["priority"] = determine_priority(paper["interestingness_score"], scoring)
@@ -484,30 +506,30 @@ def rank_papers(
         [ensure_schema(paper) for paper in papers],
         key=lambda item: (
             item.get("priority") != "Must read",
+            -float(item.get("influence_score", 0.0)),
             -float(item.get("interestingness_score", 0.0)),
             item.get("title", ""),
         ),
     )
-    max_per_topic = scoring.get("diversity", {}).get("max_same_primary_topic_in_top10", 3)
     selected: list[dict] = []
     topic_counts: Counter[str] = Counter()
     for paper in ranked:
         primary = paper.get("primary_topic", "")
-        if len(selected) < 10 and topic_counts[primary] >= max_per_topic and paper.get("priority") == "Must read":
+        if len(selected) < selection_limit and topic_counts[primary] >= max_per_topic and paper.get("priority") == "Must read":
             continue
-        if len(selected) < 10 and topic_counts[primary] >= max_per_topic and paper.get("priority") != "Must read":
+        if len(selected) < selection_limit and topic_counts[primary] >= max_per_topic and paper.get("priority") != "Must read":
             continue
         selected.append(paper)
         topic_counts[primary] += 1
-    if len(selected) < 10:
+    if len(selected) < selection_limit:
         already = {paper["id"] for paper in selected}
         for paper in ranked:
             if paper["id"] in already:
                 continue
             selected.append(paper)
-            if len(selected) >= 10:
+            if len(selected) >= selection_limit:
                 break
-    selected_ids = {paper["id"] for paper in selected[:10]}
+    selected_ids = {paper["id"] for paper in selected[:selection_limit]}
     for paper in ranked:
         paper["status"] = "active" if paper["id"] in selected_ids else paper.get("status", "new")
     return ranked
