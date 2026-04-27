@@ -5,14 +5,11 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 
-import yaml
-
 from .analysis import (
     clean_whitespace,
     first_author_name,
     grouped_by_topic,
     note_path_for_paper,
-    similarity,
     slugify,
     topic_counts,
     top_topic_rows,
@@ -53,24 +50,87 @@ def _catalog_relative_path(path_str: str) -> str:
     return path.as_posix()
 
 
-def _paper_contribution_lines(paper: dict) -> list[str]:
-    candidates = [
-        paper.get("core_contribution", ""),
-        paper.get("method", ""),
-        paper.get("why_it_matters", ""),
+def _display_topic(topic: str) -> str:
+    return clean_whitespace(topic.replace("_", " ")) or "unknown"
+
+
+def _summary_source_label(level: str) -> str:
+    return {
+        "pdf_summary": "local PDF text",
+        "abstract_summary": "abstract only",
+        "metadata_only": "metadata only",
+    }.get(level, level or "unknown")
+
+
+def _section_summary_rows(paper: dict) -> list[tuple[str, str]]:
+    summaries = paper.get("section_summaries") or {}
+    result_fallback = clean_whitespace(" ".join(paper.get("key_results", [])[:2])) or paper.get("main_result_or_claim", "")
+    rows = [
+        ("Abstract", summaries.get("abstract") or paper.get("one_sentence_summary", "")),
+        ("Introduction and Problem", summaries.get("introduction") or paper.get("core_contribution", "")),
+        ("Method", summaries.get("method") or paper.get("method", "")),
+        ("Evaluation and Results", summaries.get("results") or result_fallback),
+        ("Limitations", summaries.get("limitations") or paper.get("limitations_or_caveats", "")),
+        (
+            "Conclusion",
+            summaries.get("conclusion")
+            or "Conclusion section was not isolated reliably from the local PDF; use the original paper for the final synthesis.",
+        ),
     ]
-    unique: list[str] = []
-    seen: set[str] = set()
-    for candidate in candidates:
-        normalized = clean_whitespace(candidate)
-        key = normalized.lower()
-        if not normalized or normalized == "unknown" or key in seen:
-            continue
-        if any(similarity(normalized, existing) >= 0.84 for existing in unique):
-            continue
-        seen.add(key)
-        unique.append(normalized)
-    return unique[:3] or ["Summary based on abstract/metadata only."]
+    return [
+        (heading, clean_whitespace(text) or "Section summary unavailable from the current extraction.")
+        for heading, text in rows
+    ]
+
+
+def _paper_page_lines(paper: dict, run_date: date) -> list[str]:
+    first_author = first_author_name(paper) or "unknown"
+    published = paper.get("published_date") or run_date.isoformat()
+    secondary_topics = ", ".join(_display_topic(topic) for topic in paper.get("secondary_topics", [])) or "none"
+    lines = [
+        f"# {paper.get('title', '')}",
+        "",
+        f"*{first_author} · {published} · {_display_topic(paper.get('primary_topic', ''))} · {paper.get('priority', 'unknown')}*",
+        "",
+        _links_line(paper),
+        "",
+        "## TL;DR",
+        "",
+        clean_whitespace(paper.get("one_sentence_summary", "")) or "Summary based on abstract/metadata only.",
+        "",
+        "## Main Contribution",
+        "",
+        clean_whitespace(paper.get("core_contribution", "")) or "Summary based on abstract/metadata only.",
+        "",
+        "## Main Result",
+        "",
+        clean_whitespace(paper.get("main_result_or_claim", "")) or "unknown",
+        "",
+        "## Method in Brief",
+        "",
+        clean_whitespace(paper.get("method", "")) or "unknown",
+        "",
+        "## Summary by Section",
+        "",
+    ]
+    for heading, text in _section_summary_rows(paper):
+        lines.extend([f"### {heading}", "", text, ""])
+    lines.extend(
+        [
+            "## Caveats",
+            "",
+            clean_whitespace(paper.get("limitations_or_caveats", "")) or "Summary based on abstract/metadata only.",
+            "",
+            "## Quick Facts",
+            "",
+            f"- First author: {first_author}",
+            f"- Primary topic: {_display_topic(paper.get('primary_topic', ''))}",
+            f"- Secondary topics: {secondary_topics}",
+            f"- Fit: {paper.get('fit_score', 'unknown')}",
+            f"- Summary source: {_summary_source_label(paper.get('summary_level', ''))}",
+        ]
+    )
+    return lines
 
 
 def generate_visual_assets(top_papers: list[dict], all_papers: list[dict], taxonomy: dict, run_date: date) -> None:
@@ -189,94 +249,13 @@ def build_catalog(top_papers: list[dict], all_papers: list[dict], taxonomy: dict
     docs_run_dir.mkdir(parents=True, exist_ok=True)
     for paper in top_papers[:10]:
         slug = slugify(paper["title"])
-        catalog_card_path = f"../../../public/assets/paper_cards/{slug}.svg"
-        docs_card_path = f"../../../assets/paper_cards/{slug}.svg"
-        public_authors = [first_author_name(paper)] if first_author_name(paper) else []
-        frontmatter = {
-            "title": paper.get("title", ""),
-            "authors": public_authors,
-            "date": run_date.isoformat(),
-            "primary_topic": paper.get("primary_topic", ""),
-            "secondary_topics": paper.get("secondary_topics", []),
-            "priority": paper.get("priority", ""),
-            "fit_score": paper.get("fit_score", ""),
-            "links": {
-                "paper": paper.get("url", ""),
-                "pdf": paper.get("pdf_url", ""),
-                "code": paper.get("code_url", ""),
-                "project": paper.get("project_page", ""),
-            },
-            "image": catalog_card_path,
-        }
-        catalog_lines = [
-            "---",
-            yaml.safe_dump(frontmatter, sort_keys=False, allow_unicode=False).strip(),
-            "---",
-            "",
-            f"# {paper.get('title', '')}",
-            "",
-            f"![Paper card]({catalog_card_path})",
-            "",
-            "## TL;DR",
-            "",
-            paper.get("one_sentence_summary", "Summary based on abstract/metadata only."),
-            "",
-            "## What it contributes",
-            "",
-        ]
-        docs_frontmatter = {**frontmatter, "image": docs_card_path}
-        docs_lines = [
-            "---",
-            yaml.safe_dump(docs_frontmatter, sort_keys=False, allow_unicode=False).strip(),
-            "---",
-            "",
-            f"# {paper.get('title', '')}",
-            "",
-            f"![Paper card]({docs_card_path})",
-            "",
-            "## TL;DR",
-            "",
-            paper.get("one_sentence_summary", "Summary based on abstract/metadata only."),
-            "",
-            "## What it contributes",
-            "",
-        ]
-        for item in _paper_contribution_lines(paper):
-            catalog_lines.append(f"- {item}")
-            docs_lines.append(f"- {item}")
-        shared_tail = [
-            [
-                "",
-                "## Key results",
-                "",
-            ],
-            [f"- {item}" for item in paper.get("key_results", [])[:3] or ["Summary based on abstract/metadata only."]],
-            [
-                "",
-                "## Method in brief",
-                "",
-                paper.get("method", "unknown"),
-                "",
-                "## Caveats",
-                "",
-                paper.get("limitations_or_caveats", "unknown"),
-                "",
-                "## Links",
-                "",
-                f"- Paper: {paper.get('url', '')}",
-                f"- PDF: {paper.get('pdf_url', '')}",
-                f"- Code/project: {paper.get('code_url') or paper.get('project_page') or ''}",
-            ],
-        ]
-        for block in shared_tail:
-            catalog_lines.extend(block)
-            docs_lines.extend(block)
+        page_lines = _paper_page_lines(paper, run_date)
         note_path = note_path_for_paper(run_date, paper)
-        write_text(note_path, "\n".join(catalog_lines) + "\n")
+        write_text(note_path, "\n".join(page_lines) + "\n")
         relative_note = note_path.relative_to(ROOT).as_posix()
         paper["public_note_path"] = relative_note
-        paper["public_card_path"] = f"public/assets/paper_cards/{slug}.svg"
-        write_text(docs_run_dir / f"{slug}.md", "\n".join(docs_lines) + "\n")
+        paper["public_card_path"] = ""
+        write_text(docs_run_dir / f"{slug}.md", "\n".join(page_lines) + "\n")
 
     grouped = grouped_by_topic(all_papers)
     for topic_slug, meta in taxonomy.get("topics", {}).items():

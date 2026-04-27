@@ -1,52 +1,59 @@
----
-title: 'Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond'
-authors:
-- Meng Chu
-date: '2026-04-26'
-primary_topic: agents
-secondary_topics:
-- evaluation
-- reinforcement_learning
-priority: Must read
-fit_score: Medium
-links:
-  paper: http://arxiv.org/abs/2604.22748v1
-  pdf: https://arxiv.org/pdf/2604.22748v1
-  code: ''
-  project: ''
-image: ../../../public/assets/paper_cards/agentic-world-modeling-foundations-capabilities-laws-and-beyond.svg
----
-
 # Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond
 
-![Paper card](../../../public/assets/paper_cards/agentic-world-modeling-foundations-capabilities-laws-and-beyond.svg)
+*Meng Chu · 2026-04-24 · agents · Must read*
+
+[paper](http://arxiv.org/abs/2604.22748v1) / [pdf](https://arxiv.org/pdf/2604.22748v1)
 
 ## TL;DR
 
 We introduce a "levels x laws" taxonomy organized along two axes.
 
-## What it contributes
+## Main Contribution
 
-- We introduce a "levels x laws" taxonomy organized along two axes.
-- Because world models constitute a foundational component whose value extends beyond any single agent architecture, their growing importance makes conceptual clarity all the more urgent.
-- It looks relevant to agents and is a plausible candidate for a first-pass read.
+We introduce a "levels x laws" taxonomy organized along two axes.
 
-## Key results
+## Main Result
 
-- Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the termworld modelcarries di…
-- Conversely, world models benefit from agentgenerated experience, which provides targeted, task-relevant trajectories that improve the model’s accuracy in decision-critic…
-- Yet the diversity outlined above also creates conceptual fragmentation: a vision researcher may evaluate a world model by the visual fidelity of its generated frames, wh…
+Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the term world model carries different meanings across research communities.
 
-## Method in brief
+## Method in Brief
 
 Because world models constitute a foundational component whose value extends beyond any single agent architecture, their growing importance makes conceptual clarity all the more urgent.
 
+## Summary by Section
+
+### Abstract
+
+As AI systems move from generating text to accomplishing goals through sustained interaction, the ability to model environment dynamics becomes a central bottleneck. Agents that manipulate objects, navigate software, coordinate with others, or design experiments require predictive environment models, yet the term world model carries different meanings across research communities.
+
+### Introduction and Problem
+
+As AI systems move from generating text to accomplishing goals through sustained interaction, the ability to model environment dynamics becomes a central bottleneck. We analyze methods, failure modes, and evaluation practices across level-regime pairs, propose decision-centric evaluation principles and a minimal reproducible evaluation package, and outline architectural guidance, open problems, and governance challenges.
+
+### Method
+
+We introduce a “levels × laws” taxonomy organized along two axes. Using this framework, we synthesize over 400 works and summarize more than 100 representative systems spanning model-based reinforcement learning, video generation, web and GUI agents, multi-agent social simulation, and AI-driven scientific discovery.
+
+### Evaluation and Results
+
+We analyze methods, failure modes, and evaluation practices across level–regime pairs, propose decision-centric evaluation principles and a minimal reproducible evaluation package, and outline architectural guidance, open problems, and governance challenges. The paper is organized around three capability levels (L1 Predictor, L2 Simulator, L3 Evolver) and four governing-law regimes (physical, digital, social, scientific worlds), with supporting sections on evaluation, implementation, and open problems. Conversely, world models benefit from agentgenerated experience, which provides targeted, task-relevant trajectories that improve the model’s accuracy in decision-critical regions of the state space (Sutton, 1991).
+
+### Limitations
+
+The paper is organized around three capability levels (L1 Predictor, L2 Simulator, L3 Evolver) and four governing-law regimes (physical, digital, social, scientific worlds), with supporting sections on evaluation, implementation, and open problems.
+
+### Conclusion
+
+The paper is organized around three capability levels (L1 Predictor, L2 Simulator, L3 Evolver) and four governing-law regimes (physical, digital, social, scientific worlds), with supporting sections on evaluation, implementation, and open problems.
+
 ## Caveats
 
-Weanalyzemethods, failuremodes, andevaluationpracticesacrosslevel–regimepairs, propose decision-centric evaluation principles and a minimal reproducible evaluation package, and outline architectural guidance, open probl…
+Fast note from local PDF text. Verify claims and limitations directly in the paper.
 
-## Links
+## Quick Facts
 
-- Paper: http://arxiv.org/abs/2604.22748v1
-- PDF: https://arxiv.org/pdf/2604.22748v1
-- Code/project: 
+- First author: Meng Chu
+- Primary topic: agents
+- Secondary topics: evaluation, reinforcement learning
+- Fit: Medium
+- Summary source: local PDF text

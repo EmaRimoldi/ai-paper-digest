@@ -9,6 +9,7 @@ from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
 
+import fitz
 from pypdf import PdfReader
 
 from .config import CATALOG_DIR, REPORTS_DIR, now_iso
@@ -57,6 +58,7 @@ DEFAULT_SCHEMA = {
     "key_results": [],
     "limitations_or_caveats": "",
     "why_it_matters": "",
+    "section_summaries": {},
     "public_note_path": "",
     "public_card_path": "",
     "safe_figure_paths": [],
@@ -66,25 +68,25 @@ DEFAULT_SCHEMA = {
 
 SECTION_PATTERNS = {
     "introduction": (
-        r"(?im)^(?:[ivxlcdm]+\.\s+introduction|[0-9]+(?:\.[0-9]+)?\s+introduction|introduction)\s*$",
+        r"(?im)^(?:§?\s*[ivxlcdm]+\.\s*introduction|§?\s*[0-9]+(?:\.[0-9]+)?\s*introduction|§?\s*introduction)\s*$",
     ),
     "method": (
-        r"(?im)^(?:[ivxlcdm]+\.\s+(?:method|methods|methodology|approach|framework)|[0-9]+(?:\.[0-9]+)?\s+(?:method|methods|methodology|approach|framework)|(?:method|methods|methodology|approach|framework))\s*$",
-        r"(?im)^(?:[ivxlcdm]+\.\s+(?:proposed method|proposed approach)|[0-9]+(?:\.[0-9]+)?\s+(?:proposed method|proposed approach))\s*$",
+        r"(?im)^(?:§?\s*[ivxlcdm]+\.\s*(?:method|methods|methodology|approach|framework)|§?\s*[0-9]+(?:\.[0-9]+)?\s*(?:method|methods|methodology|approach|framework)|§?\s*(?:method|methods|methodology|approach|framework))\s*$",
+        r"(?im)^(?:§?\s*[ivxlcdm]+\.\s*(?:proposed method|proposed approach)|§?\s*[0-9]+(?:\.[0-9]+)?\s*(?:proposed method|proposed approach))\s*$",
     ),
     "results": (
-        r"(?im)^(?:[ivxlcdm]+\.\s+(?:experiments|experiment|results|evaluation|experimental results)|[0-9]+(?:\.[0-9]+)?\s+(?:experiments|experiment|results|evaluation|experimental results)|(?:experiments|experiment|results|evaluation|experimental results))\s*$",
+        r"(?im)^(?:§?\s*[ivxlcdm]+\.\s*(?:experiments|experiment|results|evaluation|evaluations|experimental results)|§?\s*[0-9]+(?:\.[0-9]+)?\s*(?:experiments|experiment|results|evaluation|evaluations|experimental results)|§?\s*(?:experiments|experiment|results|evaluation|evaluations|experimental results))\s*$",
     ),
     "discussion": (
-        r"(?im)^(?:[ivxlcdm]+\.\s+(?:discussion|limitations|limitation|future work)|[0-9]+(?:\.[0-9]+)?\s+(?:discussion|limitations|limitation|future work)|(?:discussion|limitations|limitation|future work))\s*$",
+        r"(?im)^(?:§?\s*[ivxlcdm]+\.\s*(?:discussion|limitations|limitation|future work)|§?\s*[0-9]+(?:\.[0-9]+)?\s*(?:discussion|limitations|limitation|future work)|§?\s*(?:discussion|limitations|limitation|future work))\s*$",
     ),
     "conclusion": (
-        r"(?im)^(?:[ivxlcdm]+\.\s+(?:conclusion|conclusions)|[0-9]+(?:\.[0-9]+)?\s+(?:conclusion|conclusions)|(?:conclusion|conclusions))\s*$",
+        r"(?im)^(?:§?\s*[ivxlcdm]+\.\s*(?:conclusion|conclusions)|§?\s*[0-9]+(?:\.[0-9]+)?\s*(?:conclusion|conclusions)|§?\s*(?:conclusion|conclusions))\s*$",
     ),
 }
 
 GENERIC_HEADING_PATTERN = re.compile(
-    r"(?im)^(?:[ivxlcdm]+\.\s+[a-z][^\n]{0,90}|[0-9]+(?:\.[0-9]+)?\s+[a-z][^\n]{0,90}|"
+    r"(?im)^(?:§?\s*[ivxlcdm]+\.\s*[a-z][^\n]{0,90}|§?\s*[0-9]+(?:\.[0-9]+)?\s*[a-z][^\n]{0,90}|"
     r"(?:introduction|background|preliminaries|method|methods|methodology|approach|framework|"
     r"experiments|experiment|results|evaluation|discussion|limitations|future work|conclusion|conclusions))\s*$"
 )
@@ -235,6 +237,11 @@ def ensure_schema(paper: dict) -> dict:
         clean_whitespace(tag) for tag in normalized.get("secondary_topics", []) if clean_whitespace(tag)
     ]
     normalized["key_results"] = [clean_whitespace(item) for item in normalized.get("key_results", []) if clean_whitespace(item)]
+    normalized["section_summaries"] = {
+        clean_whitespace(str(key)): clean_whitespace(str(value))
+        for key, value in (normalized.get("section_summaries") or {}).items()
+        if clean_whitespace(str(key)) and clean_whitespace(str(value))
+    }
     normalized["id"] = normalized["id"] or stable_paper_id(normalized)
     normalized["last_checked_at"] = normalized.get("last_checked_at") or now_iso()
     if not normalized.get("discovered_at"):
@@ -536,6 +543,20 @@ def extract_pdf_raw_text(paper: dict, max_pages: int = 8) -> str:
     if not pdf_path:
         return ""
     try:
+        document = fitz.open(str(pdf_path))
+        try:
+            text_parts = []
+            for page in document[:max_pages]:
+                text = page.get_text() or ""
+                if text:
+                    text_parts.append(text)
+            if text_parts:
+                return "\n\n---PAGE---\n\n".join(text_parts)
+        finally:
+            document.close()
+    except Exception:
+        pass
+    try:
         reader = PdfReader(str(pdf_path))
         text_parts = []
         for page in reader.pages[:max_pages]:
@@ -642,6 +663,7 @@ def extract_pdf_sections(paper: dict, max_pages: int = 8) -> dict[str, str]:
     section_text = _normalize_pdf_for_sections(raw_text)
     sections = {
         "front_matter": _front_matter_candidate(section_text),
+        "introduction": _section_block(section_text, "introduction"),
         "method": _section_block(section_text, "method"),
         "results": _section_block(section_text, "results"),
         "discussion": _section_block(section_text, "discussion"),
@@ -785,7 +807,7 @@ def _derive_method_sentence(primary_sentences: list[str], backup_sentences: list
         )
         for item in chosen:
             if _distinct_from(item, avoid):
-                return truncate(item, 240)
+                return item
     return "unknown"
 
 
@@ -833,40 +855,188 @@ def _derive_caveat_sentence(sentences: list[str], used_pdf: bool) -> str:
         limit=1,
     )
     if caveat:
-        return truncate(caveat[0], 220)
+        return caveat[0]
     if used_pdf:
         return "Fast note from local PDF text. Verify claims and limitations directly in the paper."
     return "Summary based on abstract/metadata only."
+
+
+def _distinct_sentence_block(sentences: list[str], limit: int = 2, avoid: list[str] | None = None) -> list[str]:
+    chosen: list[str] = []
+    blocked = avoid or []
+    for sentence in sentences:
+        if _distinct_from(sentence, chosen + blocked, threshold=0.9):
+            chosen.append(sentence)
+        if len(chosen) >= limit:
+            break
+    return chosen
+
+
+def _summarize_section(
+    primary_sentences: list[str],
+    backup_sentences: list[str],
+    keywords: tuple[str, ...] = (),
+    limit: int = 2,
+    avoid: list[str] | None = None,
+    fallback: str = "",
+) -> str:
+    for candidate_pool in (primary_sentences, backup_sentences):
+        if not candidate_pool:
+            continue
+        matching = [
+            sentence
+            for sentence in candidate_pool
+            if not keywords or any(keyword in sentence.lower() for keyword in keywords)
+        ]
+        chosen = _distinct_sentence_block(matching or candidate_pool, limit=limit, avoid=avoid)
+        if chosen:
+            return clean_whitespace(" ".join(chosen))
+    return clean_whitespace(fallback)
+
+
+def _derive_section_summaries(
+    abstract_sentences: list[str],
+    introduction_sentences: list[str],
+    method_sentences: list[str],
+    result_sentences: list[str],
+    discussion_sentences: list[str],
+    conclusion_sentences: list[str],
+    pdf_sentences: list[str],
+    paper: dict,
+) -> dict[str, str]:
+    abstract_summary = _summarize_section(
+        abstract_sentences,
+        pdf_sentences,
+        limit=2,
+        fallback=paper.get("one_sentence_summary", ""),
+    )
+    introduction_summary = _summarize_section(
+        introduction_sentences,
+        abstract_sentences or pdf_sentences,
+        keywords=(
+            "we study",
+            "we analyze",
+            "we consider",
+            "problem",
+            "challenge",
+            "goal",
+            "motivation",
+            "urgent",
+            "important",
+        ),
+        limit=2,
+        fallback=paper.get("core_contribution", ""),
+    )
+    method_summary = _summarize_section(
+        method_sentences,
+        pdf_sentences,
+        keywords=(
+            "method",
+            "approach",
+            "framework",
+            "algorithm",
+            "architecture",
+            "pipeline",
+            "using ",
+            "through ",
+            "via ",
+            "we formulate",
+            "we cast",
+            "we train",
+            "we optimize",
+            "taxonomy",
+        ),
+        limit=2,
+        fallback=paper.get("method", ""),
+    )
+    results_summary = _summarize_section(
+        result_sentences,
+        pdf_sentences,
+        keywords=(
+            "results show",
+            "we show",
+            "we demonstrate",
+            "outperform",
+            "achieve",
+            "improve",
+            "reduce",
+            "increase",
+            "benchmark",
+            "evaluation",
+            "we find",
+        ),
+        limit=3,
+        fallback=paper.get("main_result_or_claim", ""),
+    )
+    limitations_summary = _summarize_section(
+        discussion_sentences,
+        conclusion_sentences or pdf_sentences,
+        keywords=(
+            "limitation",
+            "limitations",
+            "however",
+            "future work",
+            "challenge",
+            "fails",
+            "failure",
+            "trade-off",
+            "tradeoff",
+        ),
+        limit=2,
+        fallback=paper.get("limitations_or_caveats", ""),
+    )
+    conclusion_summary = _summarize_section(
+        conclusion_sentences,
+        discussion_sentences or pdf_sentences,
+        keywords=(
+            "in conclusion",
+            "to conclude",
+            "overall",
+            "we conclude",
+            "we find",
+            "this work",
+            "this paper",
+        ),
+        limit=2,
+        fallback=paper.get("why_it_matters", ""),
+    )
+    return {
+        "abstract": abstract_summary,
+        "introduction": introduction_summary,
+        "method": method_summary,
+        "results": results_summary,
+        "limitations": limitations_summary,
+        "conclusion": conclusion_summary,
+    }
 
 
 def summarize_paper(paper: dict) -> dict:
     paper = ensure_schema(paper)
     pdf_sections = extract_pdf_sections(paper)
     abstract_sentences = [sentence for sentence in split_sentences(pdf_sections.get("abstract", "")) if _is_useful_sentence(sentence)]
+    introduction_sentences = [
+        sentence for sentence in split_sentences(pdf_sections.get("introduction", "")) if _is_useful_sentence(sentence)
+    ]
     method_sentences = [sentence for sentence in split_sentences(pdf_sections.get("method", "")) if _is_useful_sentence(sentence)]
     result_sentences_pool = [sentence for sentence in split_sentences(pdf_sections.get("results", "")) if _is_useful_sentence(sentence)]
     discussion_sentences = [
         sentence
-        for sentence in split_sentences(
-            " ".join(
-                filter(
-                    None,
-                    [
-                        pdf_sections.get("discussion", ""),
-                        pdf_sections.get("conclusion", ""),
-                    ],
-                )
-            )
-        )
+        for sentence in split_sentences(pdf_sections.get("discussion", ""))
+        if _is_useful_sentence(sentence)
+    ]
+    conclusion_sentences = [
+        sentence
+        for sentence in split_sentences(pdf_sections.get("conclusion", ""))
         if _is_useful_sentence(sentence)
     ]
     pdf_text = extract_pdf_text(paper)
     pdf_sentences = [sentence for sentence in split_sentences(pdf_text) if _is_useful_sentence(sentence)]
-    used_pdf = any((method_sentences, result_sentences_pool, discussion_sentences))
-    primary_sentences = abstract_sentences or pdf_sentences
+    used_pdf = any((introduction_sentences, method_sentences, result_sentences_pool, discussion_sentences, conclusion_sentences))
+    primary_sentences = abstract_sentences or introduction_sentences or pdf_sentences
+    contribution_source = introduction_sentences or abstract_sentences or pdf_sentences
     method_source = method_sentences or pdf_sentences
     result_source = result_sentences_pool or pdf_sentences
-    discussion_source = discussion_sentences or pdf_sentences
+    discussion_source = discussion_sentences or conclusion_sentences or pdf_sentences
     sentences = primary_sentences or pdf_sentences
     if used_pdf or pdf_sentences:
         paper["summary_level"] = "pdf_summary"
@@ -875,25 +1045,24 @@ def summarize_paper(paper: dict) -> dict:
     else:
         paper["summary_level"] = "metadata_only"
     if sentences:
-        contribution_sentences = _derive_contribution_sentences(primary_sentences)
-        first = truncate(contribution_sentences[0] if contribution_sentences else primary_sentences[0], 180)
+        contribution_sentences = _derive_contribution_sentences(contribution_source)
+        first = contribution_sentences[0] if contribution_sentences else primary_sentences[0]
         method_sentence = _derive_method_sentence(method_source, pdf_sentences, avoid=contribution_sentences)
         result_sentences = _derive_result_sentences(
             result_source,
             pdf_sentences,
             avoid=contribution_sentences + [method_sentence],
         )
-        result_sentence = truncate(result_sentences[0], 220) if result_sentences else "unknown"
+        result_sentence = result_sentences[0] if result_sentences else "unknown"
         paper["one_sentence_summary"] = first
-        paper["core_contribution"] = truncate(contribution_sentences[0], 220)
+        paper["core_contribution"] = contribution_sentences[0] if contribution_sentences else first
         paper["method"] = method_sentence
         paper["main_result_or_claim"] = result_sentence
-        paper["key_results"] = [truncate(sentence, 170) for sentence in result_sentences[:3]] or [truncate(first, 170)]
+        paper["key_results"] = result_sentences[:3] or [first]
         paper["limitations_or_caveats"] = _derive_caveat_sentence(discussion_source, used_pdf=used_pdf)
     else:
-        paper["one_sentence_summary"] = truncate(
-            f"{paper.get('title', 'This paper')} appears relevant, but the summary is based on metadata only.",
-            180,
+        paper["one_sentence_summary"] = (
+            f"{paper.get('title', 'This paper')} appears relevant, but the summary is based on metadata only."
         )
         paper["core_contribution"] = "Summary based on abstract/metadata only."
         paper["method"] = "unknown"
@@ -901,9 +1070,18 @@ def summarize_paper(paper: dict) -> dict:
         paper["key_results"] = ["Summary based on abstract/metadata only."]
         paper["limitations_or_caveats"] = "Summary based on abstract/metadata only."
     topic_title = paper.get("primary_topic", "").replace("_", " ")
-    paper["why_it_matters"] = truncate(
-        f"It looks relevant to {topic_title or 'current AI research'} and is a plausible candidate for a first-pass read.",
-        180,
+    paper["why_it_matters"] = (
+        f"It looks relevant to {topic_title or 'current AI research'} and is a plausible candidate for a first-pass read."
+    )
+    paper["section_summaries"] = _derive_section_summaries(
+        abstract_sentences=abstract_sentences,
+        introduction_sentences=introduction_sentences,
+        method_sentences=method_sentences,
+        result_sentences=result_sentences_pool,
+        discussion_sentences=discussion_sentences,
+        conclusion_sentences=conclusion_sentences,
+        pdf_sentences=pdf_sentences,
+        paper=paper,
     )
     return paper
 
